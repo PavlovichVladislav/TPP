@@ -2,24 +2,71 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+# центр графика, пока что хардкоженый
+middle_point = 70
+
 # Ф-я, которая вычисляет Евклидово расстояние между двумя точками
 def calc_distance(point1, point2):
     return np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
+# функция, которая назходит ближайшую точку из структуры line
+# к точке, которую мы передаём вторым аргументом
+# [midle_point] - точка, относительно которой будет искаться ближайшая
+def find_nearest_point(line, middle_point):
+    # собираем все точки в один массив
+    new_points = [line['start']] + line['points'] + [line['end']]
+    # инициализируем ближайшую точку
+    nearest_point = None
+    #
+    min_distance = float('inf')
+
+    for point in new_points:
+        dist = abs(point[0] - middle_point)
+        if dist < min_distance:
+            min_distance = dist
+            nearest_point = point
+
+    return nearest_point
+
+# новая ломаная строится между двух других ломаных
+# первую из них мы находим функцией find_nearest_line
+# вторую мы находим с помощью написанной ниже функции
+# мы находим вторую ломаную, т.к. нам нужна пропорция в расстояниях
+def find_second_closest_line(entrance_collection_point, found_line, lines):
+    if entrance_collection_point > found_line['collection_point']:
+        filtered_lines = [line for line in lines if line['collection_point'] > found_line['collection_point']]
+        closest_line = min(filtered_lines, key=lambda x: x['collection_point'] - found_line['collection_point'],
+                           default=None)
+    elif entrance_collection_point < found_line['collection_point']:
+        filtered_lines = [line for line in lines if line['collection_point'] < found_line['collection_point']]
+        closest_line = min(filtered_lines, key=lambda x: found_line['collection_point'] - x['collection_point'],
+                           default=None)
+    else:
+        return None  # здесь стоит обработать исключение в будущем
+
+    return closest_line
+
 # Ф-я, для поиска ближайшей ломаной, относительно которой будет построение новой
 def find_nearest_line(lines, entrance_collection_point):
-    min_distance = float('inf')
+    min_collection_point = float('inf')
     found_line = None
 
     for line in lines:
         collection_point = line['collection_point']
+        # dist это разница между точками забора
         dist = abs(collection_point - entrance_collection_point)
 
-        if dist < min_distance:
-            min_distance = dist
+        if dist < min_collection_point:
+            min_collection_point = dist
             found_line = line
 
-    return found_line, min_distance
+    nearest_point = find_nearest_point(found_line, middle_point)
+    second_line = find_second_closest_line(entrance_collection_point, found_line, lines)
+
+    print(nearest_point)
+    print(second_line)
+
+    return found_line, 10
 
 # Ф-я для поиска пересечений ломаной и контура
 # Необходимо это, т.к. новую ломаную мы изначально получаем параллельным переносом,
@@ -250,5 +297,6 @@ def main():
     plot_lines(lines, contour, entrance_collection_point)
     # строим хоп турбины
     plot_hop(result_tangents)
+
 if __name__ == "__main__":
     main()
