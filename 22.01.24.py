@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from scipy.spatial.distance import cdist
 
 # центр графика, пока что хардкоженый
 middle_point = 70
@@ -46,27 +47,80 @@ def find_second_closest_line(entrance_collection_point, found_line, lines):
 
     return closest_line
 
+# to-do проблемно вычисляется, есть стандартный пакет на python
+# функция, которая вычисляет расстояние от точки до прямой
+# start, end - точки прямой
+# point - точка, от которой считаем расстояние
+def distance_to_line(point, segment):
+    # Функция вычисляет расстояние от точки до отрезка (start, end)
+    # Преобразуем координаты точки и отрезка в массивы NumPy
+    point = np.array(point)
+    segment = np.array(segment)
+
+    # Вычисляем вектор от начала отрезка до точки
+    v = point - segment[0]
+
+    # Вычисляем нормированный вектор направления отрезка
+    direction = segment[1] - segment[0]
+    direction_normalized = direction / np.linalg.norm(direction)
+
+    # Вычисляем проекцию вектора v на направление отрезка
+    projection = np.dot(v, direction_normalized)
+
+    # Расстояние от точки до отрезка - это длина вектора v минус проекция
+    distance = np.linalg.norm(v) - projection
+
+    # Если проекция находится внутри отрезка, расстояние остается прежним,
+    # в противном случае, берем минимальное расстояние до концов отрезка
+    if 0 <= projection <= np.linalg.norm(direction):
+        return distance
+    else:
+        return min(np.linalg.norm(point - segment[0]), np.linalg.norm(point - segment[1]))
+
 # Ф-я, для поиска ближайшей ломаной, относительно которой будет построение новой
 def find_nearest_line(lines, entrance_collection_point):
-    min_collection_point = float('inf')
+    # инициализируем минимальную разность между точками забора
+    min_collection_point_diff = float('inf')
     found_line = None
 
+    # в цикле находим прямую с ближайшей к введённой в программу
+    # точкой забора
+    # по этой ломаной мы бдуем строить новую
     for line in lines:
         collection_point = line['collection_point']
-        # dist это разница между точками забора
-        dist = abs(collection_point - entrance_collection_point)
+        # collection_point_diff это разница между точками забора
+        collection_point_diff = abs(collection_point - entrance_collection_point)
 
-        if dist < min_collection_point:
-            min_collection_point = dist
+        if collection_point_diff < min_collection_point_diff:
+            min_collection_point_diff = collection_point_diff
             found_line = line
 
-    nearest_point = find_nearest_point(found_line, middle_point)
+    # у ломаной, относительно которой мы будем строить нашу новую ломаную ОПРТ
+    # нужно найти точку излома, которая будет ближе всего лежать к центру
+    nearest_point_to_midle = find_nearest_point(found_line, middle_point)
+    # находим вторую прямую, наша новая ломаная будет лежать между found_line и second_line
+    # вторая прямая нужна, чтоб можно было вычислить расстояние, на котором будет лежать наша новая ломаная
     second_line = find_second_closest_line(entrance_collection_point, found_line, lines)
 
-    print(nearest_point)
-    print(second_line)
+    # найдём расстояние от nearest_point_to_midle до второй ломаной
+    # складываем все её точки в один массив
+    points = [second_line['start']] + second_line['points'] + [second_line['end']]
+    min_dist = float('inf')
 
-    return found_line, 10
+    # перебираем последовательно все прямые ломаной и вычисляем расстояние
+    for i in range(len(points)-1):
+        dist = distance_to_line(nearest_point_to_midle, [points[i], points[i+1]])
+
+        if dist < min_dist:
+            min_dist = dist
+
+    # мы нашли полное расстояние между ломаными, между которыми будет лежать наша новая ломаная
+    # теперь нужно взять это расстояния пропорционально collection_point этих двух прямых
+
+    result_dist = min_dist * (min_collection_point_diff
+                              / (abs(found_line['collection_point'] - second_line['collection_point'])))
+
+    return found_line, min_collection_point_diff
 
 # Ф-я для поиска пересечений ломаной и контура
 # Необходимо это, т.к. новую ломаную мы изначально получаем параллельным переносом,
