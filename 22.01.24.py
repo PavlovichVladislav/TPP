@@ -330,10 +330,12 @@ def main():
     contour = [(110, 470), (78.5, 470), (72, 444), (50, 296), (37.5, 226), (30, 174), (30, 132), (60, 220), (94, 336)]
 
     lines = [
+        {'collection_point': 150, 'start': (72, 444), 'points': [], 'end': (78.5, 470)},
         {'collection_point': 120, 'start': (61.5, 372), 'points': [(79.5, 427)], 'end': (89, 470)},
-        {'collection_point': 90, 'start': (50.75, 300), 'points': [(62, 336), (85.5, 410)], 'end': (100, 470)},
+        {'collection_point': 90, 'start': (50.75, 300), 'points': [(85.5, 410)], 'end': (100, 470)},
         {'collection_point': 60, 'start': (37.5, 228), 'points': [(55, 284), (72, 346), (100, 426)], 'end': (108.5, 470)},
-        {'collection_point': 30, 'start': (30, 146), 'points': [(80, 318)], 'end': (102, 403)}
+        {'collection_point': 30, 'start': (30, 146), 'points': [(80, 318)], 'end': (102, 403)},
+        {'collection_point': 0, 'start': (30, 132), 'points': [(60, 220)], 'end': (94, 336)}
     ]
 
     entrance_collection_point = int(input('Введите entrance_collection_point: '))
@@ -351,6 +353,8 @@ def main():
     plot_lines(lines, contour, entrance_collection_point)
     # строим хоп турбины
     plot_hop(result_tangents)
+
+    print(result_tangents)
 
 if __name__ == "__main__":
     main()
