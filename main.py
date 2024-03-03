@@ -1,4 +1,8 @@
+from calc_boilers_hop import calc_boiler_hop
 from calc_optimal_equipment import calc_optimal_quipment
+
+# 1. --------------------------------------------
+# Оптимальное оборудование
 
 # Исходные данные
 # to-do: перенести в БД
@@ -61,3 +65,8 @@ print('offseason_boilers', offSeason_boilers_combination)
 print('summber_turbines', summer_turbines_combination)
 print('winter_turbines', winter_turbines_combination)
 print('offseason_turbines', offSeason_turbines_combination)
+
+# 2. --------------------------------------------
+# Расчёт ХОП для котла
+
+calc_boiler_hop('ТП-170')

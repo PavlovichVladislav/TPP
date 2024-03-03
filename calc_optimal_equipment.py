@@ -5,8 +5,8 @@ summer_month_numbers = [6, 7, 8]
 winter_month_numbers = [11, 12, 1, 2, 3]
 offSeason_month_numbers = [9, 10, 4, 5]
 
-
-def optimal_equipment_combination_per_mounth(year_task, equipment_list, month_numbers, equipment_type):
+# Оптимальное оборудования на сезон
+def optimal_equipment_combination_per_season(year_task, equipment_list, month_numbers, equipment_type):
     equipment_characteristic = ''
     year_task_column = ''
 
@@ -55,20 +55,20 @@ def optimal_equipment_combination_per_mounth(year_task, equipment_list, month_nu
 
     return optimalCombination
 
-
+# Расчёт оптимального оборудования для всех сезонов года
 def calc_optimal_quipment(year_task, boilers, turbines):
-    summer_boilers_combination = optimal_equipment_combination_per_mounth(year_task, boilers, summer_month_numbers,
+    summer_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers, summer_month_numbers,
                                                                           'boilers')
-    winter_boilers_combination = optimal_equipment_combination_per_mounth(year_task, boilers, winter_month_numbers,
+    winter_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers, winter_month_numbers,
                                                                           'boilers')
-    offSeason_boilers_combination = optimal_equipment_combination_per_mounth(year_task, boilers,
+    offSeason_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers,
                                                                              offSeason_month_numbers, 'boilers')
 
-    summer_turbines_combination = optimal_equipment_combination_per_mounth(year_task, turbines, summer_month_numbers,
+    summer_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, summer_month_numbers,
                                                                            'turbines')
-    winter_turbines_combination = optimal_equipment_combination_per_mounth(year_task, turbines, winter_month_numbers,
+    winter_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, winter_month_numbers,
                                                                            'turbines')
-    offSeason_turbines_combination = optimal_equipment_combination_per_mounth(year_task, turbines,
+    offSeason_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines,
                                                                               offSeason_month_numbers, 'turbines')
 
     return (
