@@ -1,5 +1,8 @@
 from itertools import combinations
 
+# Модуль по выполнению 1 - го задания
+# Расчёт оптимального оборудования
+
 # Номера месяцев сезонов года
 summer_month_numbers = [6, 7, 8]
 winter_month_numbers = [11, 12, 1, 2, 3]

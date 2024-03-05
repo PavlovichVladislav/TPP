@@ -1,4 +1,4 @@
-from calc_boilers_hop import calc_boiler_hop
+from calc_boilers_hop import calc_boilers_hop_per_season
 from calc_optimal_equipment import calc_optimal_quipment
 
 # 1. --------------------------------------------
@@ -69,4 +69,10 @@ print('offseason_turbines', offSeason_turbines_combination)
 # 2. --------------------------------------------
 # Расчёт ХОП для котла
 
-calc_boiler_hop('ТП-170')
+summer_boilers_hops = calc_boilers_hop_per_season(summer_boilers_combination)
+winter_boilers_hops = calc_boilers_hop_per_season(winter_boilers_combination)
+offSeason_boilers_hops = calc_boilers_hop_per_season(offSeason_boilers_combination)
+
+print("summer_boilers_hops", summer_boilers_hops)
+print("winter_boilers_hops", winter_boilers_hops)
+print("offSeason_boilers_hops", offSeason_boilers_hops)
