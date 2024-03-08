@@ -126,7 +126,7 @@ def calc_boiler_hop(boiler_mark):
     for Q in average_load_values:
         D.append(round(Q * 1.69, 2))
 
-    return {'hop': hop, 'd': D}
+    return {'mark': boiler_mark, 'b': hop, 'D': D}
 
 # Расчёт ХОП для сезонной комбинации котлов
 # До этого производился расчёт оптимального состава котлов на сезон

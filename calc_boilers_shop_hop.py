@@ -7,9 +7,12 @@ import matplotlib.pyplot as plt
 def model(x, teta0, teta1, teta2, teta3):
     return teta0 + teta1 * x + teta2 * x ** 2 + teta3 * x ** 3
 
-def calc_boiler_hop_model(boiler_hop):
+def calc_boiler_hop_model(boiler_hop, plot_for_boiler):
     # Используем curve_fit для подбора параметров регрессии
-    params, covariance = curve_fit(model, boiler_hop['hop'], boiler_hop['d'])
+    params, covariance = curve_fit(model, boiler_hop['b'], boiler_hop['D'])
+
+    if (plot_for_boiler):
+        plot_data_and_curve(params, boiler_hop)
 
     return params
 
@@ -18,30 +21,40 @@ def calc_boiler_hop_model(boiler_hop):
 # to-do: убрать функцию
 def plot_graph(x, y, title="График", x_label="Ось X", y_label="Ось Y"):
     # Создаем график
-    plt.scatter(x, y, marker='o')
+    plt.plot(x, y, marker='o')
 
     # Добавляем заголовок и метки осей
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
+    plt.grid(True)
     plt.show()
 
-def plot_model(params, x_min, x_max, num_points=100):
-    # Генерируем значения x в указанном промежутке
-    x_values = np.linspace(x_min, x_max, num_points)
+# Функция, которая на одном графике строит исходный ХОП котла и
+# его приближение с помощью регрессии
+def plot_data_and_curve(params, boiler_hop):
+    b = boiler_hop['b']
+    D = boiler_hop['D']
 
+    # Генерируем 100 точек на интервале min(b) до max(b)
+    x_values = np.linspace(min(b), max(b), 100)
+
+    # Строим кривую с помощью модели
     teta0, teta1, teta2, teta3 = params
-
-    # Вычисляем значения y с использованием модели
     y_values = model(x_values, teta0, teta1, teta2, teta3)
 
-    # Строим график
-    plt.plot(x_values, y_values)
+    # Наносим точки из коллекции на график
+    plt.scatter(b, D, label='Исходные ХОП')
 
-    # Добавляем заголовок и метки осей
-    plt.title("ХОП ТП-170 (регрессия)")
-    plt.xlabel("b")
-    plt.ylabel("D")
+    # Строим кривую на графике
+    plt.plot(x_values, y_values, color='red', label='Регрессия')
+
+    plt.xlabel('b')
+    plt.ylabel('D')
+    plt.title('Регрессия ХОП для' + boiler_hop['mark'] )
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
 def calc_boilers_shop_hop_per_season(boilers_hop, plot_for_shop, plot_for_boiler):
     # Для началаа нужно найти все уникальные значения b - промежуток суммирования
@@ -51,7 +64,7 @@ def calc_boilers_shop_hop_per_season(boilers_hop, plot_for_shop, plot_for_boiler
     unique_hops = set()
 
     for hop in boilers_hop:
-        unique_hops.update(hop['hop'])
+        unique_hops.update(hop['b'])
 
     # Отсортируем по возрастанию
     unique_hops = sorted(unique_hops)
@@ -59,7 +72,7 @@ def calc_boilers_shop_hop_per_season(boilers_hop, plot_for_shop, plot_for_boiler
     # Построим регрессию по известным значениям для ХОП каждого котла
     hop_models = []
     for hop in boilers_hop:
-        hop_models.append(calc_boiler_hop_model(hop))
+        hop_models.append(calc_boiler_hop_model(hop, plot_for_boiler))
 
     # Массив D для результата по котельному цеху
     D = [0] * len(unique_hops)

@@ -1,7 +1,51 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-from scipy.spatial.distance import cdist
+
+# Дублируется, надо выносить
+summer_month_numbers = [6, 7, 8]
+winter_month_numbers = [11, 12, 1, 2, 3]
+offSeason_month_numbers = [9, 10, 4, 5]
+
+# Надо заносить в БД
+t_20_90_steam_selection = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+pt_65_75_130_13_steam_selection = [60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115]
+pt_80_100_130_13_steam_selection = [120, 125, 130, 135, 140, 145, 0, 5, 10, 15, 20, 25]
+
+def get_collection_point(turbine_mark, season):
+    input_data = []
+    month_numbers = []
+
+    # Потом это должен быть запрос к БД
+    # Но сейчас эти данные захардкоженны в проге
+    if (turbine_mark == 'Т-20-90'):
+        input_data = t_20_90_steam_selection
+    if (turbine_mark == 'ПТ-65/75-130/13'):
+        input_data = pt_65_75_130_13_steam_selection
+    if (turbine_mark == 'ПТ-80/100-130/13'):
+        input_data = pt_80_100_130_13_steam_selection
+
+    # Эти данные можно хранить в проге, но в другом месте
+    # Можно вынести в функцию get_mounth_numbers
+    if (season == 'summer'):
+        month_numbers = summer_month_numbers
+    if (season == 'winter'):
+        month_numbers = winter_month_numbers
+    if (season == 'offSeason'):
+        month_numbers = offSeason_month_numbers
+
+    # Сама точка забора считается легко
+    # Нужно просуммировать все отборы пара по соответствующим
+    # Месяцам и поделит ьна кол-во месяцев
+    collection_point = 0
+
+    for mounth in month_numbers:
+        collection_point += input_data[mounth - 1]
+
+    collection_point /= len(month_numbers)
+
+    return collection_point
+
 
 # центр графика, пока что хардкоженый
 middle_point = 70
@@ -326,7 +370,9 @@ def plot_hop(data):
     plt.title('хоп турбины')
     plt.show()
 
-def main():
+
+
+def calc_turbine_hop(turbine_mark, season):
     contour = [(110, 470), (78.5, 470), (72, 444), (50, 296), (37.5, 226), (30, 174), (30, 132), (60, 220), (94, 336)]
 
     lines = [
@@ -338,7 +384,7 @@ def main():
         {'collection_point': 0, 'start': (30, 132), 'points': [(60, 220)], 'end': (94, 336)}
     ]
 
-    entrance_collection_point = int(input('Введите entrance_collection_point: '))
+    entrance_collection_point = get_collection_point(turbine_mark, season)
     # находим ломаную, относительно которой будет построение новой
     found_line, dist = find_nearest_line(lines, entrance_collection_point)
     # получаем новую ломаную
@@ -354,7 +400,6 @@ def main():
     # строим хоп турбины
     plot_hop(result_tangents)
 
-    print(result_tangents)
+    return result_tangents
 
-if __name__ == "__main__":
-    main()
+    # print(result_tangents)

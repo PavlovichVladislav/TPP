@@ -1,6 +1,8 @@
 from calc_boilers_hop import calc_boilers_hop_per_season
 from calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
 from calc_optimal_equipment import calc_optimal_quipment
+from turbine_hop import calc_turbine_hop
+from turbine_shop_hop import calc_turbines_shop_hop
 
 # 1. --------------------------------------------
 # Оптимальное оборудование
@@ -78,8 +80,23 @@ print("summer_boilers_hops", summer_boilers_hops)
 print("winter_boilers_hops", winter_boilers_hops)
 print("offSeason_boilers_hops", offSeason_boilers_hops)
 
-# 3.
+# 3. --------------------------------------------
 # ХОП котельного цеха
 
-boilers_shop_hop = calc_boilers_shop_hop_per_season(winter_boilers_hops, True, True)
-print(boilers_shop_hop)
+plot_for_shop = False
+plot_for_boilers = False
+
+summber_boilers_shop_hop = calc_boilers_shop_hop_per_season(summer_boilers_hops, plot_for_shop, plot_for_boilers)
+winter_boilers_shop_hop = calc_boilers_shop_hop_per_season(summer_boilers_hops, plot_for_shop, plot_for_boilers)
+offSeason_boilers_shop_hop = calc_boilers_shop_hop_per_season(summer_boilers_hops, plot_for_shop, plot_for_boilers)
+
+print(summber_boilers_shop_hop)
+print(winter_boilers_shop_hop)
+print(offSeason_boilers_shop_hop)
+
+# 4. --------------------------------------------
+# ХОП турбинного цеха
+
+calc_turbines_shop_hop(summer_turbines_combination, 'summer')
+calc_turbines_shop_hop(winter_turbines_combination, 'winter')
+calc_turbines_shop_hop(offSeason_turbines_combination, 'offSeason')
