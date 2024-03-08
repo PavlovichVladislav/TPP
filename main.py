@@ -1,4 +1,5 @@
 from calc_boilers_hop import calc_boilers_hop_per_season
+from calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
 from calc_optimal_equipment import calc_optimal_quipment
 
 # 1. --------------------------------------------
@@ -76,3 +77,9 @@ offSeason_boilers_hops = calc_boilers_hop_per_season(offSeason_boilers_combinati
 print("summer_boilers_hops", summer_boilers_hops)
 print("winter_boilers_hops", winter_boilers_hops)
 print("offSeason_boilers_hops", offSeason_boilers_hops)
+
+# 3.
+# ХОП котельного цеха
+
+boilers_shop_hop = calc_boilers_shop_hop_per_season(winter_boilers_hops, True, True)
+print(boilers_shop_hop)

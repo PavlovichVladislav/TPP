@@ -102,7 +102,7 @@ def calc_hop(relative_increase_losses):
 
     for i in range(len(relative_increase_losses)):
         hop_value = (1 + relative_increase_losses[i]) * 0.143
-        hop.append(hop_value)
+        hop.append(round(hop_value, 3))
 
     return hop
 
@@ -120,7 +120,13 @@ def calc_boiler_hop(boiler_mark):
     # Результирующий ОПРТ
     hop = calc_hop(relative_increase_losses)
 
-    return hop
+    # Расчёт D
+    # Переводим нагрузку Q в D
+    D = []
+    for Q in average_load_values:
+        D.append(round(Q * 1.69, 2))
+
+    return {'hop': hop, 'd': D}
 
 # Расчёт ХОП для сезонной комбинации котлов
 # До этого производился расчёт оптимального состава котлов на сезон
