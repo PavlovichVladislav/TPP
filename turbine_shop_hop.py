@@ -2,6 +2,7 @@ from matplotlib import pyplot as plt
 
 from turbine_hop import calc_turbine_hop
 
+# вид исходных данных, они не нужны, но оставил для того, чтобы видеть, если забуду
 hop1 = [{'interval': [30, 80], 'tangent': 2.0296}, {'interval': [80, 104.21662468513853], 'tangent': 2.2795454545454534}]
 hop2 = [{'interval': [53.2640470069776, 85.5], 'tangent': 1.8676258992805754}, {'interval': [85.5, 97.58333333333333], 'tangent': 2.4413793103448307}]
 hop3 = [{'interval': [63.852132049518566, 79.5], 'tangent': 1.8027777777777776}, {'interval': [79.5, 86.7906976744186], 'tangent': 2.670526315789481}]
@@ -28,7 +29,7 @@ def plot_hop(data):
     plt.plot(x_values, y_values, marker='o')
     plt.xlabel('N, мвт')
     plt.ylabel('Гкал / мвт/ч')
-    plt.title('хоп турбины')
+    plt.title('ХОП турбинного цеха')
     plt.show()
 
 def process_turbines(turbines_hop):
@@ -58,18 +59,16 @@ def process_turbines(turbines_hop):
 
     return result_arr
 
-# hops = process_turbines([hop1, hop2, hop3, hop4])
-# print(hops)
-# plot_hop(hops)
-
-def calc_turbines_shop_hop(turbines, season):
+def calc_turbines_shop_hop(turbines, season, plot_for_turbines):
     turbines_hops = []
+    flow_chars = []
 
     for turbine in turbines:
-        hop_value = calc_turbine_hop(turbine['type'], season)
-        turbines_hops.append(hop_value)
+        turbine_hop = calc_turbine_hop(turbine['type'], season, plot_for_turbines)
+        turbines_hops.append(turbine_hop['hop'])
+        flow_chars.append({'mark': turbine_hop['mark'], 'flow_char': turbine_hop['flow_char']})
 
     turbine_shop_hop = process_turbines(turbines_hops)
     plot_hop(turbine_shop_hop)
 
-    return turbines_hops
+    return flow_chars, turbines_hops

@@ -12,6 +12,7 @@ t_20_90_steam_selection = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
 pt_65_75_130_13_steam_selection = [60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115]
 pt_80_100_130_13_steam_selection = [120, 125, 130, 135, 140, 145, 0, 5, 10, 15, 20, 25]
 
+
 def get_collection_point(turbine_mark, season):
     input_data = []
     month_numbers = []
@@ -50,9 +51,11 @@ def get_collection_point(turbine_mark, season):
 # центр графика, пока что хардкоженый
 middle_point = 70
 
+
 # Ф-я, которая вычисляет Евклидово расстояние между двумя точками
 def calc_distance(point1, point2):
     return np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
+
 
 # функция, которая назходит ближайшую точку из структуры line
 # к точке, которую мы передаём вторым аргументом
@@ -73,6 +76,7 @@ def find_nearest_point(line, middle_point):
 
     return nearest_point
 
+
 # новая ломаная строится между двух других ломаных
 # первую из них мы находим функцией find_nearest_line
 # вторую мы находим с помощью написанной ниже функции
@@ -90,6 +94,7 @@ def find_second_closest_line(entrance_collection_point, found_line, lines):
         return None  # здесь стоит обработать исключение в будущем
 
     return closest_line
+
 
 # to-do проблемно вычисляется, есть стандартный пакет на python
 # функция, которая вычисляет расстояние от точки до прямой
@@ -120,6 +125,7 @@ def distance_to_line(point, segment):
         return distance
     else:
         return min(np.linalg.norm(point - segment[0]), np.linalg.norm(point - segment[1]))
+
 
 # Ф-я, для поиска ближайшей ломаной, относительно которой будет построение новой
 def find_nearest_line(lines, entrance_collection_point):
@@ -152,8 +158,8 @@ def find_nearest_line(lines, entrance_collection_point):
     min_dist = float('inf')
 
     # перебираем последовательно все прямые ломаной и вычисляем расстояние
-    for i in range(len(points)-1):
-        dist = distance_to_line(nearest_point_to_midle, [points[i], points[i+1]])
+    for i in range(len(points) - 1):
+        dist = distance_to_line(nearest_point_to_midle, [points[i], points[i + 1]])
 
         if dist < min_dist:
             min_dist = dist
@@ -165,6 +171,7 @@ def find_nearest_line(lines, entrance_collection_point):
                               / (abs(found_line['collection_point'] - second_line['collection_point'])))
 
     return found_line, min_collection_point_diff
+
 
 # Ф-я для поиска пересечений ломаной и контура
 # Необходимо это, т.к. новую ломаную мы изначально получаем параллельным переносом,
@@ -242,8 +249,8 @@ def find_intersects_with_contour(line, contour):
 
                 # Решение системы уравнений для поиска точки пересечения
                 if k - k_contour != 0:
-                    intersection_x = (b_contour - b) / (k - k_contour)
-                    intersection_y = k * intersection_x + b
+                    intersection_x = round((b_contour - b) / (k - k_contour), 4)
+                    intersection_y = round((k * intersection_x + b), 4)
 
                     # Проверка, лежит ли точка внутри отрезка контура
                     if (x1 <= intersection_x <= x2 or x2 <= intersection_x <= x1) and \
@@ -272,11 +279,12 @@ def create_new_line(found_line, entrance_collection_point, dist):
         'start': (found_line['start'][0], found_line['start'][1] + dist) if entrance_collection_point > found_line[
             'collection_point'] else (found_line['start'][0], found_line['start'][1] - dist),
         'points': [(point[0], point[1] + dist) if entrance_collection_point > found_line['collection_point'] else (
-        point[0], point[1] - dist) for point in found_line['points']],
+            point[0], point[1] - dist) for point in found_line['points']],
         'end': (found_line['end'][0], found_line['end'][1] + dist) if entrance_collection_point > found_line[
             'collection_point'] else (found_line['end'][0], found_line['end'][1] - dist)
     }
     return new_line
+
 
 # изначально мы строим новую ломаную параллельным переносом,
 # чтобы получить окончательную ломаную, нужно продлить её начальный и конечный отрезок до пересечения с контуром
@@ -288,7 +296,7 @@ def adjust_line_to_contour(new_line, contour):
     return new_line
 
 
-def plot_lines(lines, contour, entrance_collection_point):
+def plot_lines(lines, contour, entrance_collection_point, turbine_mark):
     plt.plot(*zip(*contour + [contour[0]]), marker='o', label='Contour', color='k')
 
     for line in lines:
@@ -307,11 +315,13 @@ def plot_lines(lines, contour, entrance_collection_point):
         plt.plot(*zip(line['start'], *line['points'], line['end']), marker='o',
                  label=label, color=color)
 
+    plt.title('Диаграмма режимов работ для турбины: ' + turbine_mark)
     plt.legend()
     plt.gca().set_aspect(0.25)
-    plt.xlabel('X')
-    plt.ylabel('Y')
+    plt.xlabel('N, МВТ')
+    plt.ylabel('Q, т/ч')
     plt.show()
+
 
 def calculate_tangents(line, transform_to_gkal):
     tangents = []
@@ -342,11 +352,12 @@ def calculate_tangents(line, transform_to_gkal):
 
     return tangents
 
+
 # строим ХОП турбны по тангенсам для интервалов
 # data - словарь из двух полей interval tangent
 # построение происходит путём отложения прямых y = tangent
 # для соответствующего интервала
-def plot_hop(data):
+def plot_hop(data, turbine_mark):
     # инициализируем массивы для x и y
     x_values = []
     y_values = []
@@ -367,20 +378,21 @@ def plot_hop(data):
     plt.plot(x_values, y_values, marker='o')
     plt.xlabel('N, мвт')
     plt.ylabel('Гкал / мвт/ч')
-    plt.title('хоп турбины')
+    plt.title('ХОП турбины' + turbine_mark)
     plt.show()
 
 
-
-def calc_turbine_hop(turbine_mark, season):
+def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
     contour = [(110, 470), (78.5, 470), (72, 444), (50, 296), (37.5, 226), (30, 174), (30, 132), (60, 220), (94, 336)]
 
+    # to-do: убрал (55, 284) в линии для 60
     lines = [
         {'collection_point': 150, 'start': (72, 444), 'points': [], 'end': (78.5, 470)},
         {'collection_point': 120, 'start': (61.5, 372), 'points': [(79.5, 427)], 'end': (89, 470)},
         {'collection_point': 90, 'start': (50.75, 300), 'points': [(85.5, 410)], 'end': (100, 470)},
-        {'collection_point': 60, 'start': (37.5, 228), 'points': [(55, 284), (72, 346), (100, 426)], 'end': (108.5, 470)},
-        {'collection_point': 30, 'start': (30, 146), 'points': [(80, 318)], 'end': (102, 403)},
+        {'collection_point': 60, 'start': (37.5, 228), 'points': [(77, 346), (100, 426)],
+         'end': (108.5, 470)},
+        {'collection_point': 30, 'start': (30, 166), 'points': [(80, 318)], 'end': (102, 403)},
         {'collection_point': 0, 'start': (30, 132), 'points': [(60, 220)], 'end': (94, 336)}
     ]
 
@@ -395,11 +407,14 @@ def calc_turbine_hop(turbine_mark, season):
 
     # тангенсы ломаной к оси x для построения ХОП
     result_tangents = calculate_tangents(new_line, True)
-    # строим диаграмму работ
-    plot_lines(lines, contour, entrance_collection_point)
-    # строим хоп турбины
-    plot_hop(result_tangents)
 
-    return result_tangents
+    # Построение графиков
+    if (plot_for_turbines):
+        # строим диаграмму работ
+        plot_lines(lines, contour, entrance_collection_point, turbine_mark)
+        # строим хоп турбины
+        plot_hop(result_tangents, turbine_mark)
+
+    return {'mark': turbine_mark, 'hop': result_tangents, 'flow_char': new_line}
 
     # print(result_tangents)
