@@ -42,14 +42,17 @@ def transform_same_type_turbines(flow_chars):
 
         # Умножение координат каждой точки на count
         start_x, start_y = item['flow_char']['start']
-        transformed_item['flow_char']['start'] = (start_x * count, start_y * count)
+        # transformed_item['flow_char']['start'] = (start_x * count, start_y * count)
+        transformed_item['flow_char']['start'] = (start_x, start_y * count)
 
         points = item['flow_char']['points']
-        transformed_points = [(x * count, y * count) for x, y in points]
+        # transformed_points = [(x * count, y * count) for x, y in points]
+        transformed_points = [(x, y * count) for x, y in points]
         transformed_item['flow_char']['points'] = transformed_points
 
         end_x, end_y = item['flow_char']['end']
-        transformed_item['flow_char']['end'] = (end_x * count, end_y * count)
+        # transformed_item['flow_char']['end'] = (end_x * count, end_y * count)
+        transformed_item['flow_char']['end'] = (end_x, end_y * count)
 
         result.append(transformed_item)
 
@@ -61,62 +64,6 @@ def delta(point1, point2):
     delta_x = point2[0] - point1[0]
     delta_y = point2[1] - point1[1]
     return delta_x, delta_y
-
-
-# def sum_flow_char(flow_char1, flow_char2):
-#     sum_flow_char = {}
-#
-#     # Создание рабочих переменных flow_char1 и flow_char2
-#     print('flow', flow_char1)
-#     print('flow', flow_char2)
-#     # Суммирование точек start
-#     sum_start = (flow_char1['start'][0] + flow_char2['start'][0], flow_char1['start'][1] + flow_char2['start'][1])
-#     sum_flow_char['start'] = sum_start
-#
-#     # Суммирование точек points
-#     for i in range(len(flow_char1['points'])):
-#         sum_point = (flow_char1['points'][i][0] + flow_char2['points'][i][0],
-#                      flow_char1['points'][i][1] + flow_char2['points'][i][1])
-#         sum_flow_char['points'] = [sum_point]
-#
-#     # Вычисление тангенсов
-#     tg1 = (flow_char1['end'][1] - flow_char1['points'][-1][1]) / (flow_char1['end'][0] - flow_char1['points'][-1][0])
-#     tg2 = (flow_char2['end'][1] - flow_char2['points'][-1][1]) / (flow_char2['end'][0] - flow_char2['points'][-1][0])
-#
-#     # Вычисление следующей точки в sum_flow_char
-#     if tg1 < tg2:
-#         next_point_x = sum_flow_char['points'][-1][0] + (flow_char1['end'][0] - flow_char1['points'][-1][0])
-#         next_point_y = sum_flow_char['points'][-1][1] + (flow_char1['end'][1] - flow_char1['points'][-1][1])
-#         sum_flow_char['points'].append((next_point_x, next_point_y))
-#
-#         last_point_x = sum_flow_char['points'][-1][0] + (flow_char2['end'][0] - flow_char2['points'][-1][0])
-#         last_point_y = sum_flow_char['points'][-1][1] + (flow_char2['end'][1] - flow_char2['points'][-1][1])
-#         sum_flow_char['points'].append((last_point_x, last_point_y))
-#     elif tg1 > tg2:
-#         next_point_x = sum_flow_char['points'][-1][0] + (flow_char2['end'][0] - flow_char2['points'][-1][0])
-#         next_point_y = sum_flow_char['points'][-1][1] + (flow_char2['end'][1] - flow_char2['points'][-1][1])
-#         sum_flow_char['points'].append((next_point_x, next_point_y))
-#
-#         next_point_x = sum_flow_char['points'][-1][0] + (flow_char1['end'][0] - flow_char1['points'][-1][0])
-#         next_point_y = sum_flow_char['points'][-1][1] + (flow_char1['end'][1] - flow_char1['points'][-1][1])
-#         sum_flow_char['points'].append((next_point_x, next_point_y))
-#
-#     # Если размерности flow_char1.points и flow_char2.points не равны
-#     else:
-#         if len(flow_char1['points']) + 1 < len(flow_char2['points']):
-#             for i in range(len(flow_char1['points']) + 2, len(flow_char2['points'])):
-#                 delta_x, delta_y = calculate_deltas(flow_char2['points'][i], flow_char2['points'][i - 1])
-#                 next_point_x = sum_flow_char['points'][-1][0] + delta_x
-#                 next_point_y = sum_flow_char['points'][-1][1] + delta_y
-#                 sum_flow_char['points'].append((next_point_x, next_point_y))
-#         else:
-#             next_point_x = sum_flow_char['points'][-1][0] + \
-#                            calculate_deltas(flow_char2['end'], flow_char2['points'][-1])[0]
-#             next_point_y = sum_flow_char['points'][-1][1] + \
-#                            calculate_deltas(flow_char2['end'], flow_char2['points'][-1])[1]
-#             sum_flow_char['points'].append((next_point_x, next_point_y))
-#
-#     return sum_flow_char
 
 def sum_flow_char(component1, component2):
     # Определение flow_char1 и flow_char2
@@ -225,14 +172,12 @@ def calc_flow_char(flow_chars):
     # Умножаем точки на графике на кол-во турбин
     transformed_flow_chars = transform_same_type_turbines(transformed_flow_chars)
 
-    # --------
-    # deprecated
+    # Если у нас всего 1 различная турбина, то её расходную характеристику
+    # и возвращаем
+    if (len(transformed_flow_chars) == 1):
+        plot_flow(transformed_flow_chars[0]['flow_char'])
 
-    # Сортируем по возрастанию количества точек излома
-    # to-do: проверить работу сортировки
-    # sorted_flow_chars = sorted(transformed_flow_chars, key=lambda x: len(x['flow_char']['points']))
-
-    # --------
+        return transformed_flow_chars[0]['flow_char']
 
     # результат
     flow_char = sum_flow_char(transformed_flow_chars[0]['flow_char'], transformed_flow_chars[1]['flow_char'])
@@ -240,7 +185,6 @@ def calc_flow_char(flow_chars):
     for i in range(2, len(transformed_flow_chars)):
         flow_char = sum_flow_char(flow_char, transformed_flow_chars[i]['flow_char'])
 
-    print(flow_char)
     plot_flow(flow_char)
 
-    return
+    return flow_char

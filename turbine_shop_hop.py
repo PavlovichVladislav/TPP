@@ -2,12 +2,6 @@ from matplotlib import pyplot as plt
 
 from turbine_hop import calc_turbine_hop
 
-# вид исходных данных, они не нужны, но оставил для того, чтобы видеть, если забуду
-hop1 = [{'interval': [30, 80], 'tangent': 2.0296}, {'interval': [80, 104.21662468513853], 'tangent': 2.2795454545454534}]
-hop2 = [{'interval': [53.2640470069776, 85.5], 'tangent': 1.8676258992805754}, {'interval': [85.5, 97.58333333333333], 'tangent': 2.4413793103448307}]
-hop3 = [{'interval': [63.852132049518566, 79.5], 'tangent': 1.8027777777777776}, {'interval': [79.5, 86.7906976744186], 'tangent': 2.670526315789481}]
-hop4 = [{'interval': [30, 60], 'tangent': 1.7306666666666664}, {'interval': [60, 96.01481481481483], 'tangent': 2.012941176470589}]
-
 def plot_hop(data):
     # инициализируем массивы для x и y
     x_values = []
@@ -71,4 +65,4 @@ def calc_turbines_shop_hop(turbines, season, plot_for_turbines):
     turbine_shop_hop = process_turbines(turbines_hops)
     plot_hop(turbine_shop_hop)
 
-    return flow_chars, turbines_hops
+    return flow_chars, turbine_shop_hop

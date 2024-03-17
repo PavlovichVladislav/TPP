@@ -15,19 +15,9 @@ tp_170_data = {
     'efficiency': [87.3, 87.5, 87.65, 87.85, 87.96, 87.97, 88.03, 88.05, 88.06]
 }
 
-tp_80_data_mock = {
-    'load': [72, 76, 79, 82, 87, 90, 94, 99, 103],
-    'efficiency': [87.2, 87.6, 87.7, 87.9, 87.95, 87.98, 88.02, 88.1, 88.12]
-}
-
-tp_87a_data_mock = {
-    'load': [73, 78, 81, 84, 88, 91, 95, 100, 104],
-    'efficiency': [87.1, 87.55, 87.68, 87.81, 87.92, 87.99, 88.05, 88.08, 88.11]
-}
-
-tp_81_data_mock = {
-    'load': [74, 79, 82, 85, 89, 92, 96, 101, 105],
-    'efficiency': [87.0, 87.45, 87.63, 87.77, 87.93, 88.0, 88.07, 88.09, 88.1]
+tp_80_data = {
+    'load': [177.6, 180, 190, 195.3, 200, 210, 213.5, 220, 230.8, 240, 248.6],
+    'efficiency': [86.63, 86.7, 86.91, 87.04, 87.11, 87.27, 87.33, 87.4, 87.48, 87.55, 87.58]
 }
 
 # Функция для определния исходнных данных для расчёта ХОП
@@ -36,11 +26,11 @@ def getInputData(boiler_mark):
     if boiler_mark == 'ТП-170':
         return tp_170_data
     if boiler_mark == 'ТП-80':
-        return tp_80_data_mock
+        return tp_80_data
     if boiler_mark == 'ТП-87А':
-        return tp_87a_data_mock
+        return tp_80_data
     if boiler_mark == 'ТП-81':
-        return tp_81_data_mock
+        return tp_80_data
 
 # 1. Расчёт потерь тепла
 # Qпот = Qi * ( (100 - Ni) / Ni )
@@ -120,13 +110,7 @@ def calc_boiler_hop(boiler_mark):
     # Результирующий ОПРТ
     hop = calc_hop(relative_increase_losses)
 
-    # Расчёт D
-    # Переводим нагрузку Q в D
-    D = []
-    for Q in average_load_values:
-        D.append(round(Q * 1.69, 2))
-
-    return {'mark': boiler_mark, 'b': hop, 'D': D}
+    return {'mark': boiler_mark, 'b': hop, 'Q': average_load_values}
 
 # Расчёт ХОП для сезонной комбинации котлов
 # До этого производился расчёт оптимального состава котлов на сезон

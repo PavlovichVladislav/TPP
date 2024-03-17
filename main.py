@@ -2,6 +2,7 @@ from calc_boilers_hop import calc_boilers_hop_per_season
 from calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
 from calc_flow_char import calc_flow_char
 from calc_optimal_equipment import calc_optimal_quipment
+from station_hop import calc_station_hop
 from turbine_hop import calc_turbine_hop
 from turbine_shop_hop import calc_turbines_shop_hop
 
@@ -77,9 +78,9 @@ summer_boilers_hops = calc_boilers_hop_per_season(summer_boilers_combination)
 winter_boilers_hops = calc_boilers_hop_per_season(winter_boilers_combination)
 offSeason_boilers_hops = calc_boilers_hop_per_season(offSeason_boilers_combination)
 
-print("summer_boilers_hops", summer_boilers_hops)
+# print("summer_boilers_hops", summer_boilers_hops)
 print("winter_boilers_hops", winter_boilers_hops)
-print("offSeason_boilers_hops", offSeason_boilers_hops)
+# print("offSeason_boilers_hops", offSeason_boilers_hops)
 
 # 3. --------------------------------------------
 # ХОП котельного цеха
@@ -87,29 +88,48 @@ print("offSeason_boilers_hops", offSeason_boilers_hops)
 plot_for_shop = False
 plot_for_boilers = False
 
-summber_boilers_shop_hop = calc_boilers_shop_hop_per_season(summer_boilers_hops, plot_for_shop, plot_for_boilers)
-winter_boilers_shop_hop = calc_boilers_shop_hop_per_season(summer_boilers_hops, plot_for_shop, plot_for_boilers)
-offSeason_boilers_shop_hop = calc_boilers_shop_hop_per_season(summer_boilers_hops, plot_for_shop, plot_for_boilers)
+summer_boilers_shop_hop = calc_boilers_shop_hop_per_season(summer_boilers_hops, plot_for_shop, plot_for_boilers)
+winter_boilers_shop_hop = calc_boilers_shop_hop_per_season(winter_boilers_hops, plot_for_shop, plot_for_boilers)
+offSeason_boilers_shop_hop = calc_boilers_shop_hop_per_season(offSeason_boilers_hops, plot_for_shop, plot_for_boilers)
 
-print(summber_boilers_shop_hop)
-print(winter_boilers_shop_hop)
-print(offSeason_boilers_shop_hop)
+# print('summer_boilers_shop_hop', summer_boilers_shop_hop)
+print('winter_boilers_shop_hop', winter_boilers_shop_hop)
+# print('offSeason_boilers_shop_hop', offSeason_boilers_shop_hop)
 
 # 4. --------------------------------------------
 # ХОП турбинного цеха
 
 plot_for_turbines = False
 
-summer_flow_chars, summer_turbines_shop_hop = calc_turbines_shop_hop(summer_turbines_combination, 'summer', plot_for_turbines)
+# summer_flow_chars, summer_turbines_shop_hop = calc_turbines_shop_hop(summer_turbines_combination, 'summer', plot_for_turbines)
 winter_flow_chars, winter_turbines_shop_hop = calc_turbines_shop_hop(winter_turbines_combination, 'winter', plot_for_turbines)
-offSeason_flow_chars, offSeason_turbines_shop_hop = calc_turbines_shop_hop(offSeason_turbines_combination, 'offSeason', plot_for_turbines)
+# offSeason_flow_chars, offSeason_turbines_shop_hop = calc_turbines_shop_hop(offSeason_turbines_combination, 'offSeason', plot_for_turbines)
 
-print('summer_flow_chars', summer_flow_chars)
+# print('summer_turbines_shop_hop', summer_turbines_shop_hop)
+print('winter_turbines_shop_hop', winter_turbines_shop_hop)
+# print('offSeason_turbines_shop_hop', offSeason_turbines_shop_hop)
+
+# 5. --------------------------------------------
+# Расходная характеристика
+# print('summer_flow_chars', summer_flow_chars)
 print('winter_flow_chars', winter_flow_chars)
-print('offSeason_flow_chars', offSeason_flow_chars)
+# print('offSeason_flow_chars', offSeason_flow_chars)
 
-# print(summer_turbines_shop_hop)
+# summer_shop_flow_char = calc_flow_char(summer_flow_chars)
+winter_shop_flow_char = calc_flow_char(winter_flow_chars)
+# offSeason_shop_flow_char = calc_flow_char(offSeason_flow_chars)
 
-shop_flow_char = calc_flow_char(winter_flow_chars)
-print(shop_flow_char)
+# print('summer_shop_flow_char', summer_shop_flow_char)
+print('winter_shop_flow_char', winter_shop_flow_char)
+# print('offSeason_shop_flow_char', offSeason_shop_flow_char)
 
+# 6. --------------------------------------------
+# ХОП станции
+
+# summer_station_hop = calc_station_hop(summer_boilers_shop_hop, summer_turbines_shop_hop, summer_shop_flow_char)
+winter_station_hop = calc_station_hop(winter_boilers_shop_hop, winter_turbines_shop_hop, winter_shop_flow_char)
+# offSeason_station_hop = calc_station_hop(offSeason_boilers_shop_hop, offSeason_turbines_shop_hop[0], offSeason_shop_flow_char)
+
+# print('summer_station_hop', summer_station_hop)
+print('winter_station_hop', winter_station_hop)
+# print('offSeason_station_hop', summer_station_hop)
