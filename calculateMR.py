@@ -2,15 +2,9 @@ def calculate_mr(demand):
     MR = []  # Инициализация массива результата MR
 
     # Перебор массива demand['pg']
-    for i in range(len(demand['pg'])):
-        print('Итерация', i)
-        # Определение индексов
-        if i == len(demand['pg']) - 1:
-            index1 = i - 1
-            index2 = i
-        else:
-            index1 = i
-            index2 = i + 1
+    for i in range(len(demand['pg']) - 1):
+        index1 = i
+        index2 = i + 1
 
         # Найдем изменение цены
         # P1 - P2
@@ -22,14 +16,15 @@ def calculate_mr(demand):
         print('deltaPg', deltaPg)
         # Найдем прирост общей выручки
         # Э1*deltaP - P2 * deltaЭ
-        deltaTR = demand['pg'][index1] * deltaP - demand['price'][index2] * deltaPg
+        # to-do: заменить модуль
+        deltaTR = abs(demand['pg'][index1] * deltaP - demand['price'][index2] * deltaPg)
         print('deltaTR', deltaTR)
         # Найдем прирост общей выручки и добавим его в массив MR
         mr = deltaTR / deltaPg
         print('mr', mr)
-        MR.append(mr)
+        MR.append(round(mr, 3))
 
-    return MR
+    return {'pg': demand['pg'][:-1], 'mr': MR}
 
 
 # Исходные данные

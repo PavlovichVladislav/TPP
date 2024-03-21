@@ -25,7 +25,7 @@ def calculate_mc(station_hop, season):
     average_fuel_price = get_average_fuel_price(fuel_price, season)
 
     # Каждое значение b умножаем на среднюю цену топлива
-    newB = [b * average_fuel_price for b in station_hop['b']]
+    newB = [round(b * average_fuel_price, 3) for b in station_hop['b']]
 
     # Возвращаем хоп, где b уже умножено на цену топлива
     return {'N': station_hop['N'], 'b': newB}
