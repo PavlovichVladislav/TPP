@@ -42,17 +42,14 @@ def transform_same_type_turbines(flow_chars):
 
         # Умножение координат каждой точки на count
         start_x, start_y = item['flow_char']['start']
-        # transformed_item['flow_char']['start'] = (start_x * count, start_y * count)
-        transformed_item['flow_char']['start'] = (start_x, start_y * count)
+        transformed_item['flow_char']['start'] = (start_x * count, start_y * count)
 
         points = item['flow_char']['points']
-        # transformed_points = [(x * count, y * count) for x, y in points]
-        transformed_points = [(x, y * count) for x, y in points]
+        transformed_points = [(x * count, y * count) for x, y in points]
         transformed_item['flow_char']['points'] = transformed_points
 
         end_x, end_y = item['flow_char']['end']
-        # transformed_item['flow_char']['end'] = (end_x * count, end_y * count)
-        transformed_item['flow_char']['end'] = (end_x, end_y * count)
+        transformed_item['flow_char']['end'] = (end_x * count, end_y * count)
 
         result.append(transformed_item)
 
@@ -158,11 +155,31 @@ def plot_flow(flow_data):
     # Настройка осей
     plt.xlabel('N, МВТ/Ч')
     plt.ylabel('D, т/ч')
-    plt.title('Расходная характеристика')
+    plt.title('Расходная характеристика станции')
 
     # Отображение графика
     plt.grid(True)
     plt.show()
+
+# Функция апроксимирует начальный отрезок расходной
+# характеристики до 0
+def update_flow_char(flow_char):
+    # Извлекаем координаты начальной точки и первой точки из списка points
+    start_x, start_y = flow_char['start']
+    point_x, point_y = flow_char['points'][0]
+
+    # Вычисляем уравнение прямой через начальную точку и первую точку из списка points
+    # y = mx + c, где m - наклон, c - точка пересечения с осью y
+    m = (point_y - start_y) / (point_x - start_x)
+    c = start_y - m * start_x
+
+    # Вычисляем значение y при x = 0
+    new_start_y = m * 0 + c
+
+    # Обновляем координаты начальной точки во входном аргументе
+    flow_char['start'] = (0, new_start_y)
+
+    return flow_char
 
 # Расчёт расходной характеристики для станции
 # Это переходное звено для расчёта ХОП станции
@@ -175,15 +192,21 @@ def calc_flow_char(flow_chars):
     # Если у нас всего 1 различная турбина, то её расходную характеристику
     # и возвращаем
     if (len(transformed_flow_chars) == 1):
+        # апроксимируем до 0
+        flow_char = update_flow_char(transformed_flow_chars[0]['flow_char'])
+
         plot_flow(transformed_flow_chars[0]['flow_char'])
 
-        return transformed_flow_chars[0]['flow_char']
+        return flow_char
 
     # результат
     flow_char = sum_flow_char(transformed_flow_chars[0]['flow_char'], transformed_flow_chars[1]['flow_char'])
 
     for i in range(2, len(transformed_flow_chars)):
         flow_char = sum_flow_char(flow_char, transformed_flow_chars[i]['flow_char'])
+
+    # апроксимируем до 0
+    flow_char = update_flow_char(flow_char)
 
     plot_flow(flow_char)
 

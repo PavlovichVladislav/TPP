@@ -5,10 +5,6 @@ from utils.regression_model import model
 def find_correspond_Q(N, flow_char):
     points = [flow_char['start']] + flow_char['points'] + [flow_char['end']]
 
-    print('correspond Q')
-    print(N)
-    print(flow_char)
-
     # Находим точки между которыми находится N
     point1_index = None
     point2_index = None
@@ -39,9 +35,6 @@ def calc_station_hop(boilers_hop, turbines_hop, flow_char):
     b = []
     N = []
 
-    print('turbines_hop', turbines_hop)
-    print('flow_char', flow_char)
-
     for turbine in turbines_hop:
         interval = turbine['interval']
         tangent = turbine['tangent']
@@ -52,7 +45,7 @@ def calc_station_hop(boilers_hop, turbines_hop, flow_char):
         N.append(interval[0])
         # Нашли по N соответствующую точку Q с помощью расходной характеристики
         Q = find_correspond_Q(interval[0], flow_char)
-        print('correspond Q', Q)
+        # print('correspond Q', Q)
         # Вычисляем соответствующую точку на ХОП котельного цеха
         b_boiler_value = model(Q, teta1, teta2, teta3, teta4)
 
