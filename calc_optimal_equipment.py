@@ -9,6 +9,9 @@ winter_month_numbers = [11, 12, 1, 2, 3]
 offSeason_month_numbers = [9, 10, 4, 5]
 
 # Оптимальное оборудования на сезон
+# to-do: year_task тоже как параметр, причём это один столбец
+# to-do: месяца извне не передаются, храним локально, в метод передаём только название сезона
+# to-do: определение сезона в утилитку можно вынести
 def optimal_equipment_combination_per_season(year_task, equipment_list, month_numbers, equipment_type):
     equipment_characteristic = ''
     year_task_column = ''
@@ -58,6 +61,7 @@ def optimal_equipment_combination_per_season(year_task, equipment_list, month_nu
 
     return optimalCombination
 
+# to-do: не нужен для работы API
 # Расчёт оптимального оборудования для всех сезонов года
 def calc_optimal_quipment(year_task, boilers, turbines):
     summer_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers, summer_month_numbers,

@@ -41,7 +41,3 @@ season = 'winter'
 
 result = calculate_mc(station_hop, season)
 print(result)
-
-
-
-
