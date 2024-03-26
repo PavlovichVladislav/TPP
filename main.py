@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
 
+from calc_boilers_hop import calc_boiler_hop
+from calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
 from calc_optimal_equipment import optimal_equipment_combination_per_season, summer_month_numbers, winter_month_numbers, \
     offSeason_month_numbers
 from mainOld import year_task
@@ -23,7 +25,6 @@ class BoilerData(BaseModel):
     heatPerformance: int
     numberOfStarts: int
 
-# Входные данные
 class BoilersInventory(BaseModel):
     """
     Котлы имеющиеся в наличии
@@ -59,3 +60,44 @@ def get_boilers_optimal(
         'winterBoilers': winter_boilers_combination,
         'offSeasonBoilers': offSeason_boilers_combination
     })
+
+class BoilersInventory(BaseModel):
+    """
+    Котлы имеющиеся в наличии
+
+    :param data: Список котлов в наличии у станции.
+    """
+    data: List[BoilerData]
+
+@app.post("/boilers/boiler-hop")
+def calc_boilers_shop_hop(
+        boiler: BoilerData
+):
+    hop = calc_boiler_hop(boiler['mark'])
+
+    # print(hop)
+
+    return {'ХОП': None}
+
+class BoilerHop(BaseModel):
+    mark: str
+    b: List[float]
+    Q: List[float]
+
+@app.post("/boilers/boiler-shop-hop")
+def calc_boilers_shop_hop(
+        boilersHop: List[BoilerHop]
+):
+    print(boilersHop)
+
+    boilers_hop = [
+        {'mark': item.mark, 'b': item.b, 'Q': item.Q}
+        for item in boilersHop
+    ]
+
+    # to-do убрать параметры для графиков
+    hop = calc_boilers_shop_hop_per_season(boilers_hop, False, False)
+
+    print(hop)
+
+    return {'ХОП': hop}

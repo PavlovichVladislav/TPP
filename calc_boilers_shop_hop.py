@@ -49,6 +49,9 @@ def calc_boilers_shop_hop_per_season(boilers_hop, plot_for_shop, plot_for_boiler
 
             Q[i] += q_value
 
+    # Округлим результат до 3 - х знаков после запятой
+    Q = [round(q, 3) for q in Q]
+
     if (plot_for_shop):
         plot_graph(Q, unique_hops, 'Хоп котельного цеха', 'Dк, т/x', 'b, т.у.т/Гкал')
 
