@@ -7,6 +7,7 @@ from calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
 from calc_optimal_equipment import optimal_equipment_combination_per_season, summer_month_numbers, winter_month_numbers, \
     offSeason_month_numbers
 from mainOld import year_task
+from turbine_shop_hop import calc_turbines_shop_hop
 
 app = FastAPI()
 
@@ -101,3 +102,81 @@ def calc_boilers_shop_hop(
     print(hop)
 
     return {'ХОП': hop}
+
+class TurbineData(BaseModel):
+    """
+    Информация об одном котле
+
+    :param name: станционный номер.
+    :param type: Марка турбины.
+    :param electricityPower: установленная электрическая мощность.
+    :param thermalPower: тепловая мощность гкал/ч.
+    :param powerGeneration: выработка электроэнергии в отчётном.
+    """
+    name: str
+    type: str
+    electricityPower: int
+    thermalPower: int
+    powerGeneration: float
+
+class TurbinesInventory(BaseModel):
+    """
+    Турбины имеющиеся в наличии
+
+    :param data: Список турбин в наличии у станции.
+    """
+    data: List[TurbineData]
+
+@app.post("/turbines/get-optimal")
+def get_turbines_optimal(
+        data: TurbinesInventory
+):
+    """
+    Получение оптимального состава турбин на каждый сезон года.
+
+    :param data: Состав котельного оборудования, имеющийся на станции.
+    :return: Объект с оптимальным составом оборудования по сезонам года
+    """
+    turbines = [turbine.dict() for turbine in data.data]
+
+    print(turbines)
+
+    summer_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, summer_month_numbers,
+                                                                          'turbines')
+    winter_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, winter_month_numbers,
+                                                                          'turbines')
+    offSeason_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines,
+                                                                             offSeason_month_numbers, 'turbines')
+
+    print(summer_turbines_combination)
+
+    return ({
+        'summerTurbines': summer_turbines_combination,
+        'winterTurbines': winter_turbines_combination,
+        'offSeasonTurbines': offSeason_turbines_combination
+    })
+
+class TurbinerHop(BaseModel):
+    mark: str
+    b: List[float]
+    Q: List[float]
+
+# @app.post("/boilers/boiler-shop-hop")
+# def get_turbines_shop_hop(
+#         turbinesHop: List[BoilerHop]
+# ):
+#     print(boilersHop)
+#
+#     boilers_hop = [
+#         {'mark': item.mark, 'b': item.b, 'Q': item.Q}
+#         for item in boilersHop
+#     ]
+#
+#     summer_flow_chars, summer_turbines_shop_hop = calc_turbines_shop_hop(summer_turbines_combination, 'summer',
+#                                                                          plot_for_turbines)
+#     winter_flow_chars, winter_turbines_shop_hop = calc_turbines_shop_hop(winter_turbines_combination, 'winter',
+#                                                                          plot_for_turbines)
+#     offSeason_flow_chars, offSeason_turbines_shop_hop = calc_turbines_shop_hop(offSeason_turbines_combination,
+#                                                                                'offSeason', plot_for_turbines)
+#
+#     return {'ХОП': hop}
