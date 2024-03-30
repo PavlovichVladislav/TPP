@@ -2,12 +2,11 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
 
-from calcBoilerHopNew import calc_boiler_hop
-from calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
+from boilers.calcBoilerHopNew import calc_boiler_hop
+from boilers.calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
 from calc_optimal_equipment import optimal_equipment_combination_per_season, summer_month_numbers, winter_month_numbers, \
     offSeason_month_numbers
 from mainOld import year_task
-from turbine_shop_hop import calc_turbines_shop_hop
 
 app = FastAPI()
 

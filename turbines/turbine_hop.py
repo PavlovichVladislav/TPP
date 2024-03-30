@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+from utils.get_work_diagram import get_work_diagram
+
 # Дублируется, надо выносить
 summer_month_numbers = [6, 7, 8]
 winter_month_numbers = [11, 12, 1, 2, 3]
@@ -46,7 +48,6 @@ def get_collection_point(turbine_mark, season):
     collection_point /= len(month_numbers)
 
     return collection_point
-
 
 # центр графика, пока что хардкоженый
 middle_point = 70
@@ -202,21 +203,6 @@ def find_intersects_with_contour(line, contour):
     # point_end - конец отрезка
     # target_point - точка относительно которой ищется результат
     def find_intersection(point_start, point_end, target_point):
-        # to-do Обработка случая вертикальности отрезка ломаной. Вроде как нет необходимости,
-        # но код оставил
-        # -----------------
-        # if point_end[0] - point_start[0] == 0:
-        #     # Если отрезок вертикальный, то уравнение прямой x = const
-        #     intersection_x = point_start[0]
-        #     intersection_y = target_point[1]  # Произвольное значение y на отрезке
-        #
-        #     # Проверка, лежит ли точка внутри отрезка контура
-        #     if (point_start[1] <= intersection_y <= point_end[1] or
-        #             point_end[1] <= intersection_y <= point_start[1]):
-        #         return (intersection_x, intersection_y)
-        #     else:
-        #         return None
-
         # Уравнение прямой по двум точкам
         k = (point_end[1] - point_start[1]) / (point_end[0] - point_start[0])
         b = point_start[1] - k * point_start[0]
@@ -252,6 +238,10 @@ def find_intersects_with_contour(line, contour):
                     intersection_x = round((b_contour - b) / (k - k_contour), 4)
                     intersection_y = round((k * intersection_x + b), 4)
 
+                    # Из - за округления число не попадает в отрезок, корректируем
+                    if (abs(intersection_y - 277.3) < 1):
+                        intersection_y = 277.3
+
                     # Проверка, лежит ли точка внутри отрезка контура
                     if (x1 <= intersection_x <= x2 or x2 <= intersection_x <= x1) and \
                             (y1 <= intersection_y <= y2 or y2 <= intersection_y <= y1):
@@ -264,6 +254,15 @@ def find_intersects_with_contour(line, contour):
         closest_intersection = min(intersections, key=lambda p: calc_distance_between_points(p, target_point))
 
         return closest_intersection
+
+    if (len(points) == 0):
+        # Находим точку пересечения с контуром для start
+        start_intersection = find_intersection(start, end, start)
+
+        # Находим точку пересечения с контуром для end
+        end_intersection = find_intersection(start, end, end)
+
+        return start_intersection, end_intersection
 
     # Находим точку пересечения с контуром для start
     start_intersection = find_intersection(start, points[0], start)
@@ -383,20 +382,10 @@ def plot_hop(data, turbine_mark):
 
 
 def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
-    contour = [(110, 470), (78.5, 470), (72, 444), (50, 296), (37.5, 226), (30, 174), (30, 132), (60, 220), (94, 336)]
-
-    # to-do: убрал (55, 284) в линии для 60
-    lines = [
-        {'collection_point': 150, 'start': (72, 444), 'points': [], 'end': (78.5, 470)},
-        {'collection_point': 120, 'start': (61.5, 372), 'points': [(79.5, 427)], 'end': (89, 470)},
-        {'collection_point': 90, 'start': (50.75, 300), 'points': [(85.5, 410)], 'end': (100, 470)},
-        {'collection_point': 60, 'start': (37.5, 228), 'points': [(77, 346), (100, 426)],
-         'end': (108.5, 470)},
-        {'collection_point': 30, 'start': (30, 166), 'points': [(80, 318)], 'end': (102, 403)},
-        {'collection_point': 0, 'start': (30, 132), 'points': [(60, 220)], 'end': (94, 336)}
-    ]
+    contour, lines = get_work_diagram(turbine_mark)
 
     entrance_collection_point = get_collection_point(turbine_mark, season)
+
     # находим ломаную, относительно которой будет построение новой
     found_line, dist = find_nearest_line(lines, entrance_collection_point)
     # получаем новую ломаную
@@ -417,4 +406,7 @@ def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
 
     return {'mark': turbine_mark, 'hop': result_tangents, 'flow_char': new_line}
 
-    # print(result_tangents)
+
+# calc_turbine_hop('ПТ-80/100-130/13', 'winter', True)
+
+# print(result_tangents)

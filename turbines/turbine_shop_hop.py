@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 
-from turbine_hop import calc_turbine_hop
+from turbines.turbine_hop import calc_turbine_hop
+
 
 def plot_hop(data):
     # инициализируем массивы для x и y
@@ -67,18 +68,14 @@ def calc_turbines_shop_hop(turbines, season, plot_for_turbines):
 
     return flow_chars, turbine_shop_hop
 
-summer_turbines_combination = [
-    {'name': 'ТГ03', 'type': 'Т-20-90', 'electricityPower': 20, 'thermalPower': 54, 'powerGeneration': 147.8},
-    {'name': 'ТГ08', 'type': 'ПТ-80/100-130/13', 'electricityPower': 80, 'thermalPower': 190, 'powerGeneration': 422.9},
-    {'name': 'ТГ09', 'type': 'ПТ-80/100-130/13', 'electricityPower': 80, 'thermalPower': 190, 'powerGeneration': 304.6}]
+# summer_turbines_combination = [
+#     {'name': 'ТГ03', 'type': 'Т-20-90', 'electricityPower': 20, 'thermalPower': 54, 'powerGeneration': 147.8},
+#     {'name': 'ТГ08', 'type': 'ПТ-80/100-130/13', 'electricityPower': 80, 'thermalPower': 190, 'powerGeneration': 422.9},
+#     {'name': 'ТГ09', 'type': 'ПТ-80/100-130/13', 'electricityPower': 80, 'thermalPower': 190, 'powerGeneration': 304.6}]
+#
+# summer_flow_chars, summer_turbines_shop_hop = calc_turbines_shop_hop(summer_turbines_combination, 'summer',
+#                                                                      True)
+#
+# print(summer_flow_chars)
+# print(summer_turbines_shop_hop)
 
-summer_flow_chars, summer_turbines_shop_hop = calc_turbines_shop_hop(summer_turbines_combination, 'summer',
-                                                                     True)
-
-print(summer_flow_chars)
-print(summer_turbines_shop_hop)
-
-# winter_flow_chars, winter_turbines_shop_hop = calc_turbines_shop_hop(winter_turbines_combination, 'winter',
-#                                                                      plot_for_turbines)
-# offSeason_flow_chars, offSeason_turbines_shop_hop = calc_turbines_shop_hop(offSeason_turbines_combination,
-#                                                                            'offSeason', plot_for_turbines)

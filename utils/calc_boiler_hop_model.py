@@ -7,9 +7,13 @@ from utils.regression_model import model
 
 # Функция, которая на одном графике строит исходный ХОП котла и
 # его приближение с помощью регрессии
-def plot_data_and_curve(params, boiler_hop):
+def plot_data_and_curve(params, boiler_hop, inversion):
     b = boiler_hop['b']
     D = boiler_hop['Q']
+
+    if (inversion):
+        b = boiler_hop['Q']
+        D = boiler_hop['b']
 
     # Генерируем 100 точек на интервале min(b) до max(b)
     x_values = np.linspace(min(b), max(b), 100)
@@ -37,11 +41,19 @@ def plot_data_and_curve(params, boiler_hop):
     plt.show()
 
 # Функция для построения модели, которой описывается график ХОП
-def calc_boiler_hop_model(boiler_hop, plot_for_boiler):
+def calc_boiler_hop_model(boiler_hop, plot_for_boiler, inversion = False):
     # Используем curve_fit для подбора параметров регрессии
-    params, covariance = curve_fit(model, boiler_hop['b'], boiler_hop['Q'])
+    params = None
+    covariance = None
+
+    # (if) Иногда нужна модель, когда мы ищем Q через b, например для хоп котельного цеха
+    # (else) В других слуаях, нам нужно найти через Q точку b, например в ХОП станции
+    if (inversion):
+        params, covariance = curve_fit(model, boiler_hop['Q'], boiler_hop['b'])
+    else:
+        params, covariance = curve_fit(model, boiler_hop['b'], boiler_hop['Q'])
 
     if (plot_for_boiler):
-        plot_data_and_curve(params, boiler_hop)
+        plot_data_and_curve(params, boiler_hop, inversion)
 
     return params
