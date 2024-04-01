@@ -8,6 +8,7 @@ from calc_optimal_equipment import optimal_equipment_combination_per_season, sum
     offSeason_month_numbers
 from mainOld import year_task
 from turbines.turbine_shop_hop_new import calc_turbines_shop_hop
+from turbines.turbine_hop_new import calc_turbine_hop
 
 app = FastAPI()
 
@@ -165,13 +166,25 @@ def get_turbines_optimal(
         'offSeasonTurbines': offSeason_turbines_combination
     })
 
-class TurbinesCombinationForHop(BaseModel):
+class TurbineDataForHop(BaseModel):
     type: str
     steam_consuption: float
 
+@app.post("/turbines/turbine-hop")
+def get_turbines_shop_hop(
+        turbineData: TurbineDataForHop
+):
+    turbine = turbineData.dict()
+
+    print(turbine)
+
+    turbines_hop = calc_turbine_hop(turbine['type'], turbine['steam_consuption'])
+
+    return {'hop': turbines_hop}
+
 @app.post("/turbines/turbine-shop-hop")
 def get_turbines_shop_hop(
-        turbinesData: List[TurbinesCombinationForHop]
+        turbinesData: List[TurbineDataForHop]
 ):
     turbines = [turbine.dict() for turbine in turbinesData]
 
