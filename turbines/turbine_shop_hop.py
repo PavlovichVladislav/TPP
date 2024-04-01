@@ -54,6 +54,7 @@ def process_turbines(turbines_hop):
 
     return result_arr
 
+# Расчёт ХОП турбинного цеха
 def calc_turbines_shop_hop(turbines, season, plot_for_turbines):
     turbines_hops = []
     flow_chars = []

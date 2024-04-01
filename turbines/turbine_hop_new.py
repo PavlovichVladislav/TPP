@@ -1,62 +1,14 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import math
 
 from utils.get_work_diagram import get_work_diagram
 
-# Дублируется, надо выносить
-summer_month_numbers = [6, 7, 8]
-winter_month_numbers = [11, 12, 1, 2, 3]
-offSeason_month_numbers = [9, 10, 4, 5]
-
-# Надо заносить в БД
-t_20_90_steam_selection = [28.3, 35.7, 27, 25.2, 15.1, 10.6, 23.7, 17.2, 27.8, 29, 35.6, 36.6]
-pt_65_75_130_13_steam_selection = [70.2, 47.6, 63.1, 53.1, 80, 85, 90, 95, 100, 105, 110, 115]
-pt_80_100_130_13_steam_selection = [120, 125, 130, 135, 140, 145, 0, 5, 10, 15, 20, 25]
-
-
-def get_collection_point(turbine_mark, season):
-    input_data = []
-    month_numbers = []
-
-    # Потом это должен быть запрос к БД
-    # Но сейчас эти данные захардкоженны в проге
-    if (turbine_mark == 'Т-20-90'):
-        input_data = t_20_90_steam_selection
-    if (turbine_mark == 'ПТ-65/75-130/13'):
-        input_data = pt_65_75_130_13_steam_selection
-    if (turbine_mark == 'ПТ-80/100-130/13'):
-        input_data = pt_80_100_130_13_steam_selection
-
-    # Эти данные можно хранить в проге, но в другом месте
-    # Можно вынести в функцию get_mounth_numbers
-    if (season == 'summer'):
-        month_numbers = summer_month_numbers
-    if (season == 'winter'):
-        month_numbers = winter_month_numbers
-    if (season == 'offSeason'):
-        month_numbers = offSeason_month_numbers
-
-    # Сама точка забора считается легко
-    # Нужно просуммировать все отборы пара по соответствующим
-    # Месяцам и поделит ьна кол-во месяцев
-    collection_point = 0
-
-    for mounth in month_numbers:
-        collection_point += input_data[mounth - 1]
-
-    collection_point /= len(month_numbers)
-
-    return collection_point
-
 # центр графика, пока что хардкоженый
 middle_point = 70
-
 
 # Ф-я, которая вычисляет Евклидово расстояние между двумя точками
 def calc_distance(point1, point2):
     return np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
-
 
 # функция, которая назходит ближайшую точку из структуры line
 # к точке, которую мы передаём вторым аргументом
@@ -76,7 +28,6 @@ def find_nearest_point(line, middle_point):
             nearest_point = point
 
     return nearest_point
-
 
 # новая ломаная строится между двух других ломаных
 # первую из них мы находим функцией find_nearest_line
@@ -285,8 +236,10 @@ def create_new_line(found_line, entrance_collection_point, dist):
     return new_line
 
 
-# изначально мы строим новую ломаную параллельным переносом,
-# чтобы получить окончательную ломаную, нужно продлить её начальный и конечный отрезок до пересечения с контуром
+# Изначально мы строим новую расходную характеристику(ломаную) параллельным переносом,
+# т.е. она может не задевать контур или выходить за него.
+# Чтобы получить окончательную расходную характеристику,
+# нужно продлить её начальный и конечный отрезок до пересечения с ограничивающим контуром.
 def adjust_line_to_contour(new_line, contour):
     start_intersection, end_intersection = find_intersects_with_contour(new_line, contour)
     new_line['start'] = start_intersection
@@ -294,34 +247,8 @@ def adjust_line_to_contour(new_line, contour):
 
     return new_line
 
-
-def plot_lines(lines, contour, entrance_collection_point, turbine_mark):
-    plt.plot(*zip(*contour + [contour[0]]), marker='o', label='Contour', color='k')
-
-    for line in lines:
-        label = 0
-        color = ''
-
-        # Если точка из lines, то у неё есть collection_point
-        # Иначе это точка нашей новой прямой, которая приходит на вход программы
-        if ("collection_point" in line):
-            label = line["collection_point"]
-            color = 'orange'
-        else:
-            color = 'magenta'
-            label = entrance_collection_point
-
-        plt.plot(*zip(line['start'], *line['points'], line['end']), marker='o',
-                 label=label, color=color)
-
-    plt.title('Диаграмма режимов работ для турбины: ' + turbine_mark)
-    plt.legend()
-    plt.gca().set_aspect(0.25)
-    plt.xlabel('N, МВТ')
-    plt.ylabel('Q, т/ч')
-    plt.show()
-
-
+# Расчёт тангенсов между осью x и отрезками расходной характеристики(ломаная)
+# Значения ХОП на интервалах, то тангенс отрезка с этого интервала
 def calculate_tangents(line):
     tangents = []
     # последовательно складываем все точки ломаной в массив для
@@ -329,9 +256,9 @@ def calculate_tangents(line):
     points = [line['start']] + line['points'] + [line['end']]
 
     for i in range(len(points) - 1):
-        # Первая точка
+        # Первая точка(левее, чем 2)
         x, y = points[i]
-        # Вторая точка
+        # Вторая точка(правее и выше, чем 1)
         x_next, y_next = points[i + 1]
         # Точка образующая с первыми двумя треугольник
         new_point = (x_next, y)
@@ -340,71 +267,35 @@ def calculate_tangents(line):
         len1 = math.sqrt((x_next - new_point[0]) ** 2 + (y_next - new_point[1]) ** 2)
         # Длина прилежащего катета
         len2 = math.sqrt((x - new_point[0]) ** 2 + (y - new_point[1]) ** 2)
-
         # Находим тангенс угла и добавляем его в массив
-        tangent = len1 / len2
+        tangent = round(len1 / len2, 3)
+
         tangents.append({'interval': [x, x_next], 'tangent': tangent})
 
     return tangents
 
-
-# строим ХОП турбны по тангенсам для интервалов
-# data - словарь из двух полей interval tangent
-# построение происходит путём отложения прямых y = tangent
-# для соответствующего интервала
-def plot_hop(data, turbine_mark):
-    # инициализируем массивы для x и y
-    x_values = []
-    y_values = []
-
-    # перебираем все словари из входных данных
-    # по сути берём интервалы и их значения тангенсов
-    # -----------------------------------------------
-    # по сути чтобы построить график нужно одинаковое кол-во x и y
-    # т.к. это координаты
-    # в цикле мы кладём в x начало и конец интервала
-    # а в y кладём соотвтетсвующих два значения тангенса для начала и конца интервала
-    for entry in data:
-        interval = entry['interval']
-        tangent = entry['tangent']
-        x_values.extend(interval)
-        y_values.extend([tangent, tangent])
-
-    plt.plot(x_values, y_values, marker='o')
-    plt.xlabel('N, мвт')
-    plt.ylabel('Гкал / мвт/ч')
-    plt.title('ХОП турбины' + turbine_mark)
-    plt.show()
-
 # Расчёт хоп отдельной турбины
-def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
+# turbine_mark - марка турбины для диаграммы режимов работ
+# entrance_collection_point - отбор пара
+def calc_turbine_hop(turbine_mark, entrance_collection_point):
     # По марке турбины определяем диаграмму режимов работ.
     # А именно ограничивающий контур и линии внутри контура
     contour, lines = get_work_diagram(turbine_mark)
 
-    entrance_collection_point = 41
-
-    # находим ломаную, относительно которой будет построение новой
+    print('Контур и линии')
+    print(contour, lines)
+    # находим ломаную в диаграмме режимов работ, относительно которой
+    # будет построение расходной характеристики нашей турбины
     found_line, dist = find_nearest_line(lines, entrance_collection_point)
-    # получаем новую ломаную
+
+    print('Линия и дистанция')
+    print(found_line, dist)
+    # получаем расходную характеристику турбины(она неполная, т.к. строилась прааллельным переносом)
     new_line = create_new_line(found_line, entrance_collection_point, dist)
-    # корректируем ломаную по контуру
+    # корректируем ломаную по контуру, т.е. продливаем концы до пересечения с контуром
     new_line = adjust_line_to_contour(new_line, contour)
-    lines.append(new_line)
 
     # тангенсы ломаной к оси x для построения ХОП
     result_tangents = calculate_tangents(new_line)
 
-    # Построение графиков
-    if (plot_for_turbines):
-        # строим диаграмму работ
-        plot_lines(lines, contour, entrance_collection_point, turbine_mark)
-        # строим хоп турбины
-        plot_hop(result_tangents, turbine_mark)
-
     return {'mark': turbine_mark, 'hop': result_tangents, 'flow_char': new_line}
-
-
-calc_turbine_hop('Т-20-90', 'winter', True)
-
-# print(result_tangents)
