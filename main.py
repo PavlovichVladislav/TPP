@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
+from typing import List, Tuple
 
 from boilers.calcBoilerHopNew import calc_boiler_hop
 from boilers.calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
 from calc_optimal_equipment import optimal_equipment_combination_per_season, summer_month_numbers, winter_month_numbers, \
     offSeason_month_numbers
 from mainOld import year_task
+from station_hop import calc_station_hop
 from turbines.turbine_shop_hop_new import calc_turbines_shop_hop
 from turbines.turbine_hop_new import calc_turbine_hop
 
@@ -193,3 +194,31 @@ def get_turbines_shop_hop(
     flow_chars, turbines_shop_hop = calc_turbines_shop_hop(turbines)
 
     return {'ХОП': turbines_shop_hop, 'FlowChars': flow_chars}
+
+class HopValuePerInterval(BaseModel):
+    interval: Tuple[float, float]
+    tangent: float
+
+class TurbinesShopHop(BaseModel):
+    data: List[HopValuePerInterval]
+
+class BoilerShopHop(BaseModel):
+    b: List[float]
+    Q: List[float]
+
+class ShopFlowChar(BaseModel):
+    start: Tuple[float, float]
+    points: List[Tuple[float, float]]
+    end: Tuple[float, float]
+
+@app.post("/station/station-hop")
+def get_turbines_shop_hop(
+        turbineShopHop: TurbinesShopHop,
+        boilersShopHop: BoilerShopHop,
+        shopFlowChar: ShopFlowChar
+):
+    turbineShopHop = [hopPerInterval.dict() for hopPerInterval in turbineShopHop.data]
+
+    station_hop = calc_station_hop(boilersShopHop.dict(), turbineShopHop, shopFlowChar.dict())
+
+    return {'stationHop': station_hop}
