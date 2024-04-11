@@ -1,17 +1,31 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List, Tuple
+from typing import List, Tuple, Literal
 
 from boilers.calcBoilerHopNew import calc_boiler_hop
 from boilers.calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
 from calc_optimal_equipment import optimal_equipment_combination_per_season, summer_month_numbers, winter_month_numbers, \
     offSeason_month_numbers
 from mainOld import year_task
+from optimize.calculateMC import calculate_mc
+from optimize.calculateMR import calculate_mr
+from optimize.tppOptimization import tppOptimize
 from station_hop import calc_station_hop
 from turbines.turbine_shop_hop_new import calc_turbines_shop_hop
 from turbines.turbine_hop_new import calc_turbine_hop
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# Добавляем middleware для обработки CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Можно настроить на конкретные домены
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешаем все методы HTTP
+    allow_headers=["*"],  # Разрешаем все заголовки HTTP
+)
+
 
 class BoilerData(BaseModel):
     """
@@ -22,10 +36,11 @@ class BoilerData(BaseModel):
     :param heatPerformance: Номинальная максимальная теплопроизводительность Т/Ч.
     :param numberOfStarts: Количество запусков с момента начала эксплуатации.
     """
-    stationNumber: str
+    station_number: str
     mark: str
-    heatPerformance: int
-    numberOfStarts: int
+    heat_performance: int
+    station_number: int
+
 
 class BoilersInventory(BaseModel):
     """
@@ -54,14 +69,12 @@ def get_boilers_optimal(
                                                                           'boilers')
     offSeason_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers,
                                                                              offSeason_month_numbers, 'boilers')
-
-    print(summer_boilers_combination)
-
     return ({
         'summerBoilers': summer_boilers_combination,
         'winterBoilers': winter_boilers_combination,
         'offSeasonBoilers': offSeason_boilers_combination
     })
+
 
 class BoilersInventory(BaseModel):
     """
@@ -70,6 +83,7 @@ class BoilersInventory(BaseModel):
     :param data: Список котлов в наличии у станции.
     """
     data: List[BoilerData]
+
 
 class DataForBoilerHop(BaseModel):
     """
@@ -81,24 +95,21 @@ class DataForBoilerHop(BaseModel):
     load: List[float]
     efficiency: List[float]
 
+
 @app.post("/boilers/boiler-hop")
 def calc_boilers_shop_hop(
         hopData: DataForBoilerHop
 ):
-
     hop = calc_boiler_hop({'load': hopData.load, 'efficiency': hopData.efficiency})
 
-    print({'load': hopData.load, 'efficiency': hopData.efficiency})
-    print(hopData)
+    return hop
 
-    print(hop)
-
-    return {'ХОП': hop}
 
 class BoilerHop(BaseModel):
     mark: str
     b: List[float]
     Q: List[float]
+
 
 @app.post("/boilers/boiler-shop-hop")
 def calc_boilers_shop_hop(
@@ -113,6 +124,7 @@ def calc_boilers_shop_hop(
     hop = calc_boilers_shop_hop_per_season(boilers_hop, False, False)
 
     return {'ХОП': hop}
+
 
 class TurbineData(BaseModel):
     """
@@ -130,6 +142,7 @@ class TurbineData(BaseModel):
     thermalPower: int
     powerGeneration: float
 
+
 class TurbinesInventory(BaseModel):
     """
     Турбины имеющиеся в наличии
@@ -137,6 +150,7 @@ class TurbinesInventory(BaseModel):
     :param data: Список турбин в наличии у станции.
     """
     data: List[TurbineData]
+
 
 @app.post("/turbines/get-optimal")
 def get_turbines_optimal(
@@ -153,11 +167,11 @@ def get_turbines_optimal(
     print(turbines)
 
     summer_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, summer_month_numbers,
-                                                                          'turbines')
+                                                                           'turbines')
     winter_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, winter_month_numbers,
-                                                                          'turbines')
+                                                                           'turbines')
     offSeason_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines,
-                                                                             offSeason_month_numbers, 'turbines')
+                                                                              offSeason_month_numbers, 'turbines')
 
     print(summer_turbines_combination)
 
@@ -167,9 +181,11 @@ def get_turbines_optimal(
         'offSeasonTurbines': offSeason_turbines_combination
     })
 
+
 class TurbineDataForHop(BaseModel):
     type: str
     steam_consuption: float
+
 
 @app.post("/turbines/turbine-hop")
 def get_turbines_shop_hop(
@@ -183,6 +199,7 @@ def get_turbines_shop_hop(
 
     return {'hop': turbines_hop}
 
+
 @app.post("/turbines/turbine-shop-hop")
 def get_turbines_shop_hop(
         turbinesData: List[TurbineDataForHop]
@@ -195,21 +212,26 @@ def get_turbines_shop_hop(
 
     return {'ХОП': turbines_shop_hop, 'FlowChars': flow_chars}
 
+
 class HopValuePerInterval(BaseModel):
     interval: Tuple[float, float]
     tangent: float
 
+
 class TurbinesShopHop(BaseModel):
     data: List[HopValuePerInterval]
+
 
 class BoilerShopHop(BaseModel):
     b: List[float]
     Q: List[float]
 
+
 class ShopFlowChar(BaseModel):
     start: Tuple[float, float]
     points: List[Tuple[float, float]]
     end: Tuple[float, float]
+
 
 @app.post("/station/station-hop")
 def get_turbines_shop_hop(
@@ -222,3 +244,45 @@ def get_turbines_shop_hop(
     station_hop = calc_station_hop(boilersShopHop.dict(), turbineShopHop, shopFlowChar.dict())
 
     return {'stationHop': station_hop}
+
+
+# предельный доход
+class MR(BaseModel):
+    pg: List[float]
+    mr: List[float]
+
+
+# предельный издержки
+class Hop(BaseModel):
+    N: List[float]
+    b: List[float]
+
+
+# спрос
+class Demand(BaseModel):
+    pg: List[float]
+    price: List[float]
+
+
+# Оптимальный режим работы станции за сезон
+@app.post("/station/optimize")
+def get_turbines_shop_hop(
+        hop: Hop,
+        fuelPirce: List[float],
+        demand: Demand,
+        season: str
+):
+    print(season)
+    # Преобразуем входные данные в словари
+    hop = hop.dict()
+    demand = demand.dict()
+
+    # Считаем предельный доход
+    mr = calculate_mr(demand)
+    # Считаем предельные издержки
+    mc = calculate_mc(hop, fuelPirce, season)
+
+    # Считаем оптимальный режим работы станции
+    optimize = tppOptimize(mr, mc, demand)
+
+    return {'optimize': optimize}

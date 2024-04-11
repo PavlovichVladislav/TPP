@@ -17,8 +17,8 @@ def optimal_equipment_combination_per_season(year_task, equipment_list, month_nu
     year_task_column = ''
 
     if (equipment_type == 'boilers'):
-        year_task_column = 'heatPerformance'
-        equipment_characteristic = 'heatPerformance'
+        year_task_column = 'heat_performance'
+        equipment_characteristic = 'heat_performance'
 
     if (equipment_type == 'turbines'):
         year_task_column = 'outputPower'

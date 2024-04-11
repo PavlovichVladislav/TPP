@@ -1,5 +1,7 @@
 # from boilers.calc_boilers_hop import calc_boilers_hop_per_season
 # from boilers.calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
+# from optimize.calculateMC import calculate_mc
+# from optimize.calculateMR import calculate_mr
 # from turbines.calc_flow_char import calc_flow_char
 # from calc_optimal_equipment import calc_optimal_quipment
 # from station_hop import calc_station_hop
@@ -43,18 +45,18 @@
 # # heatRelease - отпуск тепла
 # # hearPerformance - тепплопроизводительность
 year_task = [
-    {'month': 1, 'powerGeneration': 231.8, 'outputPower': 311.6, 'heatRelease': 352.6, 'heatPerformance': 800.93},
-    {'month': 2, 'powerGeneration': 206, 'outputPower': 294.5, 'heatRelease': 281.6, 'heatPerformance': 683.77},
-    {'month': 3, 'powerGeneration': 147.3, 'outputPower': 197.9, 'heatRelease': 253.4, 'heatPerformance': 575.59},
-    {'month': 4, 'powerGeneration': 121.6, 'outputPower': 168.8, 'heatRelease': 187.9, 'heatPerformance': 441.0},
-    {'month': 5, 'powerGeneration': 85.6, 'outputPower': 115.1, 'heatRelease': 92.2, 'heatPerformance': 209.42},
-    {'month': 6, 'powerGeneration': 46.3, 'outputPower': 64.3, 'heatRelease': 56.6, 'heatPerformance': 132.85},
-    {'month': 7, 'powerGeneration': 23.9, 'outputPower': 32.1, 'heatRelease': 45.0, 'heatPerformance': 102.22},
-    {'month': 8, 'powerGeneration': 87.4, 'outputPower': 117.5, 'heatRelease': 70.0, 'heatPerformance': 159.01},
-    {'month': 9, 'powerGeneration': 103.2, 'outputPower': 143.3, 'heatRelease': 62.7, 'heatPerformance': 147.19},
-    {'month': 10, 'powerGeneration': 150, 'outputPower': 201.6, 'heatRelease': 186.2, 'heatPerformance': 423},
-    {'month': 11, 'powerGeneration': 200, 'outputPower': 277.8, 'heatRelease': 267.3, 'heatPerformance': 627.41},
-    {'month': 12, 'powerGeneration': 238, 'outputPower': 319.9, 'heatRelease': 291.2, 'heatPerformance': 661.46}
+    {'month': 1, 'powerGeneration': 231.8, 'outputPower': 311.6, 'heatRelease': 352.6, 'heat_performance': 800.93},
+    {'month': 2, 'powerGeneration': 206, 'outputPower': 294.5, 'heatRelease': 281.6, 'heat_performance': 683.77},
+    {'month': 3, 'powerGeneration': 147.3, 'outputPower': 197.9, 'heatRelease': 253.4, 'heat_performance': 575.59},
+    {'month': 4, 'powerGeneration': 121.6, 'outputPower': 168.8, 'heatRelease': 187.9, 'heat_performance': 441.0},
+    {'month': 5, 'powerGeneration': 85.6, 'outputPower': 115.1, 'heatRelease': 92.2, 'heat_performance': 209.42},
+    {'month': 6, 'powerGeneration': 46.3, 'outputPower': 64.3, 'heatRelease': 56.6, 'heat_performance': 132.85},
+    {'month': 7, 'powerGeneration': 23.9, 'outputPower': 32.1, 'heatRelease': 45.0, 'heat_performance': 102.22},
+    {'month': 8, 'powerGeneration': 87.4, 'outputPower': 117.5, 'heatRelease': 70.0, 'heat_performance': 159.01},
+    {'month': 9, 'powerGeneration': 103.2, 'outputPower': 143.3, 'heatRelease': 62.7, 'heat_performance': 147.19},
+    {'month': 10, 'powerGeneration': 150, 'outputPower': 201.6, 'heatRelease': 186.2, 'heat_performance': 423},
+    {'month': 11, 'powerGeneration': 200, 'outputPower': 277.8, 'heatRelease': 267.3, 'heat_performance': 627.41},
+    {'month': 12, 'powerGeneration': 238, 'outputPower': 319.9, 'heatRelease': 291.2, 'heat_performance': 661.46}
 ]
 #
 # (summer_boilers_combination,
@@ -101,9 +103,12 @@ year_task = [
 #
 # plot_for_turbines = False
 #
-# summer_flow_chars, summer_turbines_shop_hop = calc_turbines_shop_hop(summer_turbines_combination, 'summer', plot_for_turbines)
-# winter_flow_chars, winter_turbines_shop_hop = calc_turbines_shop_hop(winter_turbines_combination, 'winter', plot_for_turbines)
-# offSeason_flow_chars, offSeason_turbines_shop_hop = calc_turbines_shop_hop(offSeason_turbines_combination, 'offSeason', plot_for_turbines)
+# summer_flow_chars, summer_turbines_shop_hop = calc_turbines_shop_hop(summer_turbines_combination, 'summer',
+#                                                                      plot_for_turbines)
+# winter_flow_chars, winter_turbines_shop_hop = calc_turbines_shop_hop(winter_turbines_combination, 'winter',
+#                                                                      plot_for_turbines)
+# offSeason_flow_chars, offSeason_turbines_shop_hop = calc_turbines_shop_hop(offSeason_turbines_combination, 'offSeason',
+#                                                                            plot_for_turbines)
 #
 # print('summer_turbines_shop_hop', summer_turbines_shop_hop)
 # print('winter_turbines_shop_hop', winter_turbines_shop_hop)
@@ -128,10 +133,42 @@ year_task = [
 #
 # summer_station_hop = calc_station_hop(summer_boilers_shop_hop, summer_turbines_shop_hop, summer_shop_flow_char)
 # winter_station_hop = calc_station_hop(winter_boilers_shop_hop, winter_turbines_shop_hop, winter_shop_flow_char)
-# offSeason_station_hop = calc_station_hop(offSeason_boilers_shop_hop, offSeason_turbines_shop_hop, offSeason_shop_flow_char)
+# offSeason_station_hop = calc_station_hop(offSeason_boilers_shop_hop, offSeason_turbines_shop_hop,
+#                                          offSeason_shop_flow_char)
 #
 # print('summer_station_hop', summer_station_hop)
 # print('winter_station_hop', winter_station_hop)
 # print('offSeason_station_hop', offSeason_station_hop)
 #
-# # tppOptimize()
+# # 7. Оптимизация работы станции
+#
+# # demand = {'pg': [14000, 17000, 20000, 22000, 24000, 27000],
+# #           'price': [1153.823537, 1058.174361, 967.885009, 910.6697875, 855.837, 778.053614]}
+#
+# # demand = {
+# #     'pg': [13300, 23900, 24000, 46300, 70900, 87400],
+# #     'price': [1284.210526, 736.5690377, 794.7083333, 492.6133909, 259.026798, 335.1373]
+# # }
+#
+# demand = {'pg': [14000, 17000, 20000, 22000, 24000, 27000, 30000, 30100, 30200],
+#           'price': [1153.823537, 1058.174361, 967.885009, 910.6697875, 855.837, 778.053614, 705.6303418, 703.3085408,
+#                     700.9926952]}
+#
+# result_MR = calculate_mr(demand)
+#
+# print('MR', result_MR)
+#
+# # Цены на топливо
+# fuel_price = [314.66, 290.3, 346.13, 327.89, 306.26, 335.53, 409.96, 346.85, 371.01, 366.85, 427.21, 536]
+#
+# MC_summer = calculate_mc(summer_station_hop, fuel_price, 'summer')
+# MC_winter = calculate_mc(winter_station_hop, fuel_price, 'winter')
+# MC_offSeason = calculate_mc(offSeason_station_hop, fuel_price, 'offSeason')
+#
+# print('MC_summer', MC_summer)
+# print('MC_winter', MC_winter)
+# print('MC_offSeason', MC_offSeason)
+#
+# tppOptimize(result_MR, MC_summer, demand)
+# tppOptimize(result_MR, MC_winter, demand)
+# tppOptimize(result_MR, MC_offSeason, demand)

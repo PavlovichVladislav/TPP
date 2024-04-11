@@ -405,6 +405,6 @@ def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
     return {'mark': turbine_mark, 'hop': result_tangents, 'flow_char': new_line}
 
 
-calc_turbine_hop('Т-20-90', 'winter', True)
+# calc_turbine_hop('Т-20-90', 'winter', True)
 
 # print(result_tangents)

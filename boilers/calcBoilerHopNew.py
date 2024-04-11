@@ -77,4 +77,4 @@ def calc_boiler_hop(inputData):
     # Результирующий ОПРТ
     hop = calc_hop(relative_increase_losses)
 
-    return {'b': hop, 'Q': average_load_values}
+    return {'b_values': hop, 'Q_values': average_load_values}

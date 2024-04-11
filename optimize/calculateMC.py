@@ -20,7 +20,7 @@ def get_average_fuel_price(fuel_price, season):
     return average_fuel_price
 
 
-def calculate_mc(station_hop, season):
+def calculate_mc(station_hop, fuel_price, season):
     # Получаем среднюю цену топлива за сезон
     average_fuel_price = get_average_fuel_price(fuel_price, season)
 
@@ -31,13 +31,13 @@ def calculate_mc(station_hop, season):
     return {'N': station_hop['N'], 'b': newB}
 
 
-# ХОП станции
-station_hop = {'N': [44.17, 100, 130.5, 130.5, 150, 197.31, 197.31, 300, 350.31],
-               'b': [0.0312, 0.0315, 0.032, 0.0487, 0.0489, 0.0491, 0.0682, 0.0688, 0.069]}
-# Цены на топливо
-fuel_price = [314.66, 290.3, 346.13, 327.89, 306.26, 335.53, 409.96, 346.85, 371.01, 366.85, 427.21, 536]
-
-season = 'winter'
-
-result = calculate_mc(station_hop, season)
-print(result)
+# # ХОП станции
+# station_hop = {'N': [44.17, 100, 130.5, 130.5, 150, 197.31, 197.31, 300, 350.31],
+#                'b': [0.0312, 0.0315, 0.032, 0.0487, 0.0489, 0.0491, 0.0682, 0.0688, 0.069]}
+# # Цены на топливо
+# fuel_price = [314.66, 290.3, 346.13, 327.89, 306.26, 335.53, 409.96, 346.85, 371.01, 366.85, 427.21, 536]
+#
+# season = 'winter'
+#
+# result = calculate_mc(station_hop, season)
+# print(result)

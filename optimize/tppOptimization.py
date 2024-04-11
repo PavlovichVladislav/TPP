@@ -33,6 +33,9 @@ def plot_graph(new_MR, new_Demand, MC, intersection_point, x_opt, y_opt):
 
 
 def tppOptimize(MR, MC, demand):
+    # print(MR)
+    # print(MC)
+    # print(demand)
     model_mr = polynomial_fit(MR['pg'], MR['mr'], 2)
     model_demand = polynomial_fit(demand['pg'], demand['price'], 2)
 
@@ -51,6 +54,9 @@ def tppOptimize(MR, MC, demand):
     intersection_point = (x_opt, y_opt)
 
     plot_graph(new_Mr, new_Demand, MC, intersection_point, x_opt, y_opt)
+
+    # возвращаем оптимальную мощность и цену
+    return {'N': x_opt, 'P': y_opt}
 
 
 # Пример использования
