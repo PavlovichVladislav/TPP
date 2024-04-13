@@ -21,8 +21,8 @@ def optimal_equipment_combination_per_season(year_task, equipment_list, month_nu
         equipment_characteristic = 'heat_performance'
 
     if (equipment_type == 'turbines'):
-        year_task_column = 'outputPower'
-        equipment_characteristic = 'electricityPower'
+        year_task_column = 'output_power'
+        equipment_characteristic = 'electricity_power'
 
     # Плановая производительность на месяц сезона
     planned_perfomance_per_month = 0

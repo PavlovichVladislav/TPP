@@ -27,13 +27,13 @@
 # ]
 #
 # boilers = [
-#     {'stationNumber': '3', 'mark': 'ТП-170', 'heatPerformance': 150, 'numberOfStarts': 461},
-#     {'stationNumber': '4', 'mark': 'ТП-170', 'heatPerformance': 170, 'numberOfStarts': 491},
-#     {'stationNumber': '5', 'mark': 'ТП-170', 'heatPerformance': 170, 'numberOfStarts': 530},
-#     {'stationNumber': '6', 'mark': 'ТП-80', 'heatPerformance': 170, 'numberOfStarts': 562},
-#     {'stationNumber': '7', 'mark': 'ТП-87А', 'heatPerformance': 420, 'numberOfStarts': 437},
-#     {'stationNumber': '8', 'mark': 'ТП-81', 'heatPerformance': 420, 'numberOfStarts': 504},
-#     {'stationNumber': '9', 'mark': 'ТП-81', 'heatPerformance': 420, 'numberOfStarts': 358}
+#     {'stationNumber': '3', 'mark': 'ТП-170', 'heat_performance': 150, 'numberOfStarts': 461},
+#     {'stationNumber': '4', 'mark': 'ТП-170', 'heat_performance': 170, 'numberOfStarts': 491},
+#     {'stationNumber': '5', 'mark': 'ТП-170', 'heat_performance': 170, 'numberOfStarts': 530},
+#     {'stationNumber': '6', 'mark': 'ТП-80', 'heat_performance': 170, 'numberOfStarts': 562},
+#     {'stationNumber': '7', 'mark': 'ТП-87А', 'heat_performance': 420, 'numberOfStarts': 437},
+#     {'stationNumber': '8', 'mark': 'ТП-81', 'heat_performance': 420, 'numberOfStarts': 504},
+#     {'stationNumber': '9', 'mark': 'ТП-81', 'heat_performance': 420, 'numberOfStarts': 358}
 # ]
 #
 # # Годовое задание по выработке тепловой и электрической энергии по месяцам
@@ -41,22 +41,22 @@
 # # Декабрь это 12 -й месяц
 # # month - месяц
 # # powerGeneration - выработка электроэнергии
-# # outputPower - выдаваемая мощность
+# # output_power - выдаваемая мощность
 # # heatRelease - отпуск тепла
 # # hearPerformance - тепплопроизводительность
 year_task = [
-    {'month': 1, 'powerGeneration': 231.8, 'outputPower': 311.6, 'heatRelease': 352.6, 'heat_performance': 800.93},
-    {'month': 2, 'powerGeneration': 206, 'outputPower': 294.5, 'heatRelease': 281.6, 'heat_performance': 683.77},
-    {'month': 3, 'powerGeneration': 147.3, 'outputPower': 197.9, 'heatRelease': 253.4, 'heat_performance': 575.59},
-    {'month': 4, 'powerGeneration': 121.6, 'outputPower': 168.8, 'heatRelease': 187.9, 'heat_performance': 441.0},
-    {'month': 5, 'powerGeneration': 85.6, 'outputPower': 115.1, 'heatRelease': 92.2, 'heat_performance': 209.42},
-    {'month': 6, 'powerGeneration': 46.3, 'outputPower': 64.3, 'heatRelease': 56.6, 'heat_performance': 132.85},
-    {'month': 7, 'powerGeneration': 23.9, 'outputPower': 32.1, 'heatRelease': 45.0, 'heat_performance': 102.22},
-    {'month': 8, 'powerGeneration': 87.4, 'outputPower': 117.5, 'heatRelease': 70.0, 'heat_performance': 159.01},
-    {'month': 9, 'powerGeneration': 103.2, 'outputPower': 143.3, 'heatRelease': 62.7, 'heat_performance': 147.19},
-    {'month': 10, 'powerGeneration': 150, 'outputPower': 201.6, 'heatRelease': 186.2, 'heat_performance': 423},
-    {'month': 11, 'powerGeneration': 200, 'outputPower': 277.8, 'heatRelease': 267.3, 'heat_performance': 627.41},
-    {'month': 12, 'powerGeneration': 238, 'outputPower': 319.9, 'heatRelease': 291.2, 'heat_performance': 661.46}
+    {'month': 1, 'powerGeneration': 231.8, 'output_power': 311.6, 'heatRelease': 352.6, 'heat_performance': 800.93},
+    {'month': 2, 'powerGeneration': 206, 'output_power': 294.5, 'heatRelease': 281.6, 'heat_performance': 683.77},
+    {'month': 3, 'powerGeneration': 147.3, 'output_power': 197.9, 'heatRelease': 253.4, 'heat_performance': 575.59},
+    {'month': 4, 'powerGeneration': 121.6, 'output_power': 168.8, 'heatRelease': 187.9, 'heat_performance': 441.0},
+    {'month': 5, 'powerGeneration': 85.6, 'output_power': 115.1, 'heatRelease': 92.2, 'heat_performance': 209.42},
+    {'month': 6, 'powerGeneration': 46.3, 'output_power': 64.3, 'heatRelease': 56.6, 'heat_performance': 132.85},
+    {'month': 7, 'powerGeneration': 23.9, 'output_power': 32.1, 'heatRelease': 45.0, 'heat_performance': 102.22},
+    {'month': 8, 'powerGeneration': 87.4, 'output_power': 117.5, 'heatRelease': 70.0, 'heat_performance': 159.01},
+    {'month': 9, 'powerGeneration': 103.2, 'output_power': 143.3, 'heatRelease': 62.7, 'heat_performance': 147.19},
+    {'month': 10, 'powerGeneration': 150, 'output_power': 201.6, 'heatRelease': 186.2, 'heat_performance': 423},
+    {'month': 11, 'powerGeneration': 200, 'output_power': 277.8, 'heatRelease': 267.3, 'heat_performance': 627.41},
+    {'month': 12, 'powerGeneration': 238, 'output_power': 319.9, 'heatRelease': 291.2, 'heat_performance': 661.46}
 ]
 #
 # (summer_boilers_combination,

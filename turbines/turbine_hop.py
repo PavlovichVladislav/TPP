@@ -242,10 +242,15 @@ def find_intersects_with_contour(line, contour):
                     if (abs(intersection_y - 277.3) < 1):
                         intersection_y = 277.3
 
+                    print(intersection_x)
+                    print(intersection_y)
+
                     # Проверка, лежит ли точка внутри отрезка контура
                     if (x1 <= intersection_x <= x2 or x2 <= intersection_x <= x1) and \
-                            (y1 <= intersection_y <= y2 or y2 <= intersection_y <= y1):
+                            ((y1 - 0.5) <= intersection_y <= (y2 + 0.5) or (y2 -0.5) <= intersection_y <= y1 + 0.5):
                         intersections.append((intersection_x, intersection_y))
+
+        print(intersections)
 
         if not intersections:
             return None
@@ -328,6 +333,8 @@ def calculate_tangents(line):
     # удобного перебора
     points = [line['start']] + line['points'] + [line['end']]
 
+    print(line)
+
     for i in range(len(points) - 1):
         # Первая точка
         x, y = points[i]
@@ -340,6 +347,9 @@ def calculate_tangents(line):
         len1 = math.sqrt((x_next - new_point[0]) ** 2 + (y_next - new_point[1]) ** 2)
         # Длина прилежащего катета
         len2 = math.sqrt((x - new_point[0]) ** 2 + (y - new_point[1]) ** 2)
+
+        print(len1)
+        print(len2)
 
         # Находим тангенс угла и добавляем его в массив
         tangent = len1 / len2
@@ -382,14 +392,19 @@ def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
     # А именно ограничивающий контур и линии внутри контура
     contour, lines = get_work_diagram(turbine_mark)
 
-    entrance_collection_point = 41
+    entrance_collection_point = 80.4
 
     # находим ломаную, относительно которой будет построение новой
     found_line, dist = find_nearest_line(lines, entrance_collection_point)
+
+    print(found_line, dist)
+
     # получаем новую ломаную
     new_line = create_new_line(found_line, entrance_collection_point, dist)
+    print(new_line)
     # корректируем ломаную по контуру
     new_line = adjust_line_to_contour(new_line, contour)
+    print('adjust', new_line)
     lines.append(new_line)
 
     # тангенсы ломаной к оси x для построения ХОП
@@ -405,6 +420,6 @@ def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
     return {'mark': turbine_mark, 'hop': result_tangents, 'flow_char': new_line}
 
 
-# calc_turbine_hop('Т-20-90', 'winter', True)
+# calc_turbine_hop('Т-20-90', 'summer', True)
 
 # print(result_tangents)

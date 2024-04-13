@@ -14,6 +14,7 @@ from station_hop import calc_station_hop
 from turbines.turbine_shop_hop_new import calc_turbines_shop_hop
 from turbines.turbine_hop_new import calc_turbine_hop
 from fastapi.middleware.cors import CORSMiddleware
+from turbines.get_collection_point_new import get_collection_point
 
 app = FastAPI()
 
@@ -97,7 +98,7 @@ class DataForBoilerHop(BaseModel):
 
 
 @app.post("/boilers/boiler-hop")
-def calc_boilers_shop_hop(
+def calc_boiler_hop(
         hopData: DataForBoilerHop
 ):
     hop = calc_boiler_hop({'load': hopData.load, 'efficiency': hopData.efficiency})
@@ -106,24 +107,27 @@ def calc_boilers_shop_hop(
 
 
 class BoilerHop(BaseModel):
-    mark: str
-    b: List[float]
-    Q: List[float]
+    id: int
+    boiler_mark: str
+    b_values: List[float]
+    Q_values: List[float]
 
 
 @app.post("/boilers/boiler-shop-hop")
 def calc_boilers_shop_hop(
         boilersHop: List[BoilerHop]
 ):
+    print(boilersHop)
+
     boilers_hop = [
-        {'mark': item.mark, 'b': item.b, 'Q': item.Q}
+        {'mark': item.boiler_mark, 'b': item.b_values, 'Q': item.Q_values}
         for item in boilersHop
     ]
 
     # to-do убрать параметры для графиков
     hop = calc_boilers_shop_hop_per_season(boilers_hop, False, False)
 
-    return {'ХОП': hop}
+    return hop
 
 
 class TurbineData(BaseModel):
@@ -136,11 +140,11 @@ class TurbineData(BaseModel):
     :param thermalPower: тепловая мощность гкал/ч.
     :param powerGeneration: выработка электроэнергии в отчётном.
     """
-    name: str
-    type: str
-    electricityPower: int
-    thermalPower: int
-    powerGeneration: float
+    station_number: int
+    mark: str
+    electricity_power: int
+    thermal_power: int
+    power_generation: float
 
 
 class TurbinesInventory(BaseModel):
@@ -164,41 +168,42 @@ def get_turbines_optimal(
     """
     turbines = [turbine.dict() for turbine in data.data]
 
-    print(turbines)
-
     summer_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, summer_month_numbers,
                                                                            'turbines')
     winter_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, winter_month_numbers,
                                                                            'turbines')
     offSeason_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines,
                                                                               offSeason_month_numbers, 'turbines')
-
-    print(summer_turbines_combination)
-
     return ({
         'summerTurbines': summer_turbines_combination,
         'winterTurbines': winter_turbines_combination,
         'offSeasonTurbines': offSeason_turbines_combination
     })
 
+class DataForCollectionPoint(BaseModel):
+    steam_consumption: List[float]
+    season: str
+
+
+@app.post("/turbines/collection-point")
+def get_turbines_shop_hop(
+        data: DataForCollectionPoint
+):
+    collection_point = get_collection_point(data.steam_consumption, data.season)
+
+    return collection_point
 
 class TurbineDataForHop(BaseModel):
-    type: str
-    steam_consuption: float
-
+    mark: str
+    steam_consumption: float
 
 @app.post("/turbines/turbine-hop")
 def get_turbines_shop_hop(
         turbineData: TurbineDataForHop
 ):
-    turbine = turbineData.dict()
+    turbines_hop = calc_turbine_hop(turbineData.mark, turbineData.steam_consumption)
 
-    print(turbine)
-
-    turbines_hop = calc_turbine_hop(turbine['type'], turbine['steam_consuption'])
-
-    return {'hop': turbines_hop}
-
+    return turbines_hop
 
 @app.post("/turbines/turbine-shop-hop")
 def get_turbines_shop_hop(

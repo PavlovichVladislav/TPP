@@ -195,7 +195,7 @@ def find_intersects_with_contour(line, contour):
 
                     # Проверка, лежит ли точка внутри отрезка контура
                     if (x1 <= intersection_x <= x2 or x2 <= intersection_x <= x1) and \
-                            (y1 <= intersection_y <= y2 or y2 <= intersection_y <= y1):
+                            ((y1 - 0.5) <= intersection_y <= (y2 + 0.5) or (y2 -0.5) <= intersection_y <= y1 + 0.5):
                         intersections.append((intersection_x, intersection_y))
 
         if not intersections:
@@ -282,14 +282,10 @@ def calc_turbine_hop(turbine_mark, entrance_collection_point):
     # А именно ограничивающий контур и линии внутри контура
     contour, lines = get_work_diagram(turbine_mark)
 
-    print('Контур и линии')
-    print(contour, lines)
     # находим ломаную в диаграмме режимов работ, относительно которой
     # будет построение расходной характеристики нашей турбины
     found_line, dist = find_nearest_line(lines, entrance_collection_point)
 
-    print('Линия и дистанция')
-    print(found_line, dist)
     # получаем расходную характеристику турбины(она неполная, т.к. строилась прааллельным переносом)
     new_line = create_new_line(found_line, entrance_collection_point, dist)
     # корректируем ломаную по контуру, т.е. продливаем концы до пересечения с контуром
