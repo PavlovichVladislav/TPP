@@ -17,13 +17,13 @@
 # # Но у него должна оставаться возможность их выгрузить
 #
 # turbines = [
-#     {'name': 'ТГ03', 'type': 'Т-20-90', 'electricityPower': 20, 'thermalPower': 54, 'powerGeneration': 147.8},
-#     {'name': 'ТГ04', 'type': 'Т-20-90', 'electricityPower': 20, 'thermalPower': 54, 'powerGeneration': 151.0},
-#     {'name': 'ТГ05', 'type': 'Т-20-90', 'electricityPower': 20, 'thermalPower': 54, 'powerGeneration': 93.9},
-#     {'name': 'ТГ06', 'type': 'ПТ-65/75-130/13', 'electricityPower': 65, 'thermalPower': 139, 'powerGeneration': 252.7},
-#     {'name': 'ТГ07', 'type': 'ПТ-65/75-130/13', 'electricityPower': 65, 'thermalPower': 139, 'powerGeneration': 268.0},
-#     {'name': 'ТГ08', 'type': 'ПТ-80/100-130/13', 'electricityPower': 80, 'thermalPower': 190, 'powerGeneration': 422.9},
-#     {'name': 'ТГ09', 'type': 'ПТ-80/100-130/13', 'electricityPower': 80, 'thermalPower': 190, 'powerGeneration': 304.6}
+#     {'name': 'ТГ03', 'type': 'Т-20-90', 'electricity_power': 20, 'thermalPower': 54, 'powerGeneration': 147.8},
+#     {'name': 'ТГ04', 'type': 'Т-20-90', 'electricity_power': 20, 'thermalPower': 54, 'powerGeneration': 151.0},
+#     {'name': 'ТГ05', 'type': 'Т-20-90', 'electricity_power': 20, 'thermalPower': 54, 'powerGeneration': 93.9},
+#     {'name': 'ТГ06', 'type': 'ПТ-65/75-130/13', 'electricity_power': 65, 'thermalPower': 139, 'powerGeneration': 252.7},
+#     {'name': 'ТГ07', 'type': 'ПТ-65/75-130/13', 'electricity_power': 65, 'thermalPower': 139, 'powerGeneration': 268.0},
+#     {'name': 'ТГ08', 'type': 'ПТ-80/100-130/13', 'electricity_power': 80, 'thermalPower': 190, 'powerGeneration': 422.9},
+#     {'name': 'ТГ09', 'type': 'ПТ-80/100-130/13', 'electricity_power': 80, 'thermalPower': 190, 'powerGeneration': 304.6}
 # ]
 #
 # boilers = [

@@ -194,28 +194,31 @@ def get_turbines_shop_hop(
     return collection_point
 
 class TurbineDataForHop(BaseModel):
-    mark: str
-    steam_consumption: float
+    turbine_mark: str
+    steam_consumption: List[float]
 
 @app.post("/turbines/turbine-hop")
-def get_turbines_shop_hop(
+def get_turbine_hop(
         turbineData: TurbineDataForHop
 ):
     turbines_hop = calc_turbine_hop(turbineData.mark, turbineData.steam_consumption)
 
     return turbines_hop
 
+class TurbinesShopHopData(BaseModel):
+    turbinesData: List[TurbineDataForHop]
+    season: str
+
+
 @app.post("/turbines/turbine-shop-hop")
 def get_turbines_shop_hop(
-        turbinesData: List[TurbineDataForHop]
+    data: TurbinesShopHopData
 ):
-    turbines = [turbine.dict() for turbine in turbinesData]
+    turbines = [turbine.dict() for turbine in data.turbinesData]
 
-    print(turbines)
+    flow_char, turbines_shop_hop = calc_turbines_shop_hop(turbines, data.season)
 
-    flow_chars, turbines_shop_hop = calc_turbines_shop_hop(turbines)
-
-    return {'ХОП': turbines_shop_hop, 'FlowChars': flow_chars}
+    return flow_char, turbines_shop_hop
 
 
 class HopValuePerInterval(BaseModel):

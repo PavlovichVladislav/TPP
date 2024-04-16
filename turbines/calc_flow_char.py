@@ -31,6 +31,8 @@ def calc_turbines(flow_chars):
 
     return unique_turbines
 
+# Если турбин >=2, то её расходная харакетристика
+# Умножается на кол-во турбин в парке
 def transform_same_type_turbines(flow_chars):
     result = []
 
@@ -108,16 +110,16 @@ def sum_flow_char(component1, component2):
             sum_flow_char['points'][-1][0] + (flow_char1['end'][0] - flow_char1['points'][-1][0]),
             sum_flow_char['points'][-1][1] + (flow_char1['end'][1] - flow_char1['points'][-1][1]))
     else:
-        # Проверка условия размерности точек
-        if len(flow_char1['points']) + 1 != len(flow_char2['points']):
-            raise ValueError("Размерность точек неверна")
-
         # Добавление следующей точки в sum_flow_char
         sum_flow_char['points'].append((flow_char1['end'][0] + flow_char2['points'][len(flow_char1['points'])][0],
                                         flow_char1['end'][1] + flow_char2['points'][len(flow_char1['points'])][1]))
 
+        # Если точек в flow_char2 больше, чем в flow_char1 более чем на одну
+        # т.е. на две и более
         if len(flow_char1['points']) + 1 < len(flow_char2['points']):
+            # Начинаем перебор с +2 точек, т.к. +1 - ую мы уже прибавили к последней точке
             for i in range(len(flow_char1['points']) + 2, len(flow_char2['points'])):
+                # считаем делта x и дельта y для оставшихся отрезков в flow_char2 и переносим их в сумму
                 delta_x, delta_y = delta(flow_char2['points'][i], flow_char2['points'][i - 1])
                 next_point = (sum_flow_char['points'][-1][0] + delta_x, sum_flow_char['points'][-1][1] + delta_y)
                 sum_flow_char['points'].append(next_point)
@@ -125,6 +127,9 @@ def sum_flow_char(component1, component2):
             sum_flow_char['end'] = (
             sum_flow_char['points'][-1][0] + (flow_char2['end'][0] - flow_char2['points'][-1][0]),
             sum_flow_char['points'][-1][1] + (flow_char2['end'][1] - flow_char2['points'][-1][1]))
+
+        # Если точек больше всего на одну,
+        # то просто переносим оставшийся отрезок
         else:
             sum_flow_char['end'] = (
             sum_flow_char['points'][-1][0] + (flow_char2['end'][0] - flow_char2['points'][-1][0]),
@@ -136,7 +141,8 @@ def plot_flow(flow_data):
     # Извлечение координат точек
     start_x, start_y = flow_data['start']
     end_x, end_y = flow_data['end']
-    points_x, points_y = zip(*flow_data['points'])
+    points = flow_data.get('points', [])
+    points_x, points_y = zip(*points) if points else ([], [])
 
     # Создание графика
     plt.figure(figsize=(8, 6))
@@ -144,10 +150,13 @@ def plot_flow(flow_data):
     # Нанесение точек
     plt.plot(start_x, start_y, 'bo', label='Start')
     plt.plot(end_x, end_y, 'ro', label='End')
-    plt.plot(points_x, points_y, 'go', label='Points')
 
     # Соединение точек линиями
     plt.plot([start_x] + list(points_x) + [end_x], [start_y] + list(points_y) + [end_y], 'k-')
+
+    # Если есть точки, нанести их
+    if points:
+        plt.plot(points_x, points_y, 'go', label='Points')
 
     # Добавление легенды
     plt.legend()
@@ -164,9 +173,15 @@ def plot_flow(flow_data):
 # Функция апроксимирует начальный отрезок расходной
 # характеристики до 0
 def update_flow_char(flow_char):
-    # Извлекаем координаты начальной точки и первой точки из списка points
+    # Извлекаем координаты начальной точки
+    # Вторая точка по уолмчанию считается последней, если
+    # Же в массиве points есть точки, то второй будет 0 - я точка
+    # из points
     start_x, start_y = flow_char['start']
-    point_x, point_y = flow_char['points'][0]
+    point_x, point_y = flow_char['end']
+
+    if (len(flow_char['points']) > 0):
+        point_x, point_y = flow_char['points'][0]
 
     # Вычисляем уравнение прямой через начальную точку и первую точку из списка points
     # y = mx + c, где m - наклон, c - точка пересечения с осью y
@@ -184,6 +199,7 @@ def update_flow_char(flow_char):
 # Расчёт расходной характеристики для станции
 # Это переходное звено для расчёта ХОП станции
 def calc_flow_char(flow_chars):
+    print(flow_chars)
     # Считаем кол-во турбин каждого типа и удаляем дубликаты
     transformed_flow_chars = calc_turbines(flow_chars)
     # Умножаем точки на графике на кол-во турбин

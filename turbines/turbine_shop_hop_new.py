@@ -1,4 +1,6 @@
+from turbines.calc_flow_char import calc_flow_char
 from turbines.turbine_hop_new import calc_turbine_hop
+from turbines.get_collection_point_new import get_collection_point
 
 def process_turbines(turbines_hop):
     # Combine all dictionaries into one array
@@ -28,17 +30,25 @@ def process_turbines(turbines_hop):
     return result_arr
 
 # Расчёт ХОП турбинного цеха
-def calc_turbines_shop_hop(turbines):
+def calc_turbines_shop_hop(turbines, season):
     turbines_hops = []
     flow_chars = []
 
     for turbine in turbines:
-        print(turbine)
-        turbine_hop = calc_turbine_hop(turbine['type'], turbine['steam_consuption'])
+        # Сезонный расход пара для отдельной турбины
+        steam_consuption = get_collection_point(turbine['steam_consumption'], season)
+        # Хоп турбины
+        turbine_hop = calc_turbine_hop(turbine['turbine_mark'], steam_consuption)
+        # Добавим в массив
         turbines_hops.append(turbine_hop['hop'])
+        # Посчитаем расходную характеристику для турбины
         flow_chars.append({'mark': turbine_hop['mark'], 'flow_char': turbine_hop['flow_char']})
 
+    # Посчитаем хоп турбинного цеха из ХОП отдельных турбин
     turbine_shop_hop = process_turbines(turbines_hops)
+    # Посчитаем расходную характеристику турбинного цеха
 
-    return flow_chars, turbine_shop_hop
+    flow_char = calc_flow_char(flow_chars)
+
+    return flow_char, turbine_shop_hop
 
