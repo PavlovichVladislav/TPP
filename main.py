@@ -276,24 +276,25 @@ class Demand(BaseModel):
     pg: List[float]
     price: List[float]
 
+class stationOptimizeData(BaseModel):
+    hop: Hop
+    fuelPirce: List[float]
+    demand: Demand
+    season: str
 
 # Оптимальный режим работы станции за сезон
 @app.post("/station/optimize")
 def get_turbines_shop_hop(
-        hop: Hop,
-        fuelPirce: List[float],
-        demand: Demand,
-        season: str
+    data: stationOptimizeData
 ):
-    print(season)
     # Преобразуем входные данные в словари
-    hop = hop.dict()
-    demand = demand.dict()
+    hop = data.hop.dict()
+    demand = data.demand.dict()
 
     # Считаем предельный доход
     mr = calculate_mr(demand)
     # Считаем предельные издержки
-    mc = calculate_mc(hop, fuelPirce, season)
+    mc = calculate_mc(hop, data.fuelPirce, data.season)
 
     # Считаем оптимальный режим работы станции
     optimize = tppOptimize(mr, mc, demand)

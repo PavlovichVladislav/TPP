@@ -199,7 +199,6 @@ def update_flow_char(flow_char):
 # Расчёт расходной характеристики для станции
 # Это переходное звено для расчёта ХОП станции
 def calc_flow_char(flow_chars):
-    print(flow_chars)
     # Считаем кол-во турбин каждого типа и удаляем дубликаты
     transformed_flow_chars = calc_turbines(flow_chars)
     # Умножаем точки на графике на кол-во турбин
