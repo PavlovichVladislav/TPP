@@ -11,7 +11,7 @@ offSeason_month_numbers = [9, 10, 4, 5]
 
 # Надо заносить в БД
 t_20_90_steam_selection = [28.3, 35.7, 27, 25.2, 15.1, 10.6, 23.7, 17.2, 27.8, 29, 35.6, 36.6]
-pt_65_75_130_13_steam_selection = [70.2, 47.6, 63.1, 53.1, 80, 85, 90, 95, 100, 105, 110, 115]
+pt_65_75_130_13_steam_selection = [70.2, 47.6, 63.1, 53.1, 0, 0, 0, 0, 0, 20.2, 51.3, 51]
 pt_80_100_130_13_steam_selection = [120, 125, 130, 135, 140, 145, 0, 5, 10, 15, 20, 25]
 
 
@@ -382,7 +382,7 @@ def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
     # А именно ограничивающий контур и линии внутри контура
     contour, lines = get_work_diagram(turbine_mark)
 
-    entrance_collection_point = 80.4
+    entrance_collection_point = get_collection_point(turbine_mark, season)
 
     # находим ломаную, относительно которой будет построение новой
     found_line, dist = find_nearest_line(lines, entrance_collection_point)

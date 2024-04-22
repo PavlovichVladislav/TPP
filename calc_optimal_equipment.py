@@ -39,7 +39,7 @@ def optimal_equipment_combination_per_season(year_task, equipment_list, month_nu
     optimalCombination = None
     # Минимальная излишняя выработка
     min_difference = float('inf')
-    for i in range(1, len(equipment_list) + 1):
+    for i in range(2, len(equipment_list) + 1):
         for combo in combinations(equipment_list, i):
             # Общая производительность оборудования
             total_performance = sum(equipment[equipment_characteristic] for equipment in combo)
