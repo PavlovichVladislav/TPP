@@ -130,9 +130,17 @@ def distance_to_line(point, segment):
 
 # Ф-я, для поиска ближайшей ломаной, относительно которой будет построение новой
 def find_nearest_line(lines, entrance_collection_point):
+    # Если расход пара - это одна из линий контура, то её и возвращаем
+    for line in lines:
+        if line['collection_point'] == entrance_collection_point:
+            return line, 0
+
     # инициализируем минимальную разность между точками забора
     min_collection_point_diff = float('inf')
     found_line = None
+
+    print(lines)
+    print(entrance_collection_point)
 
     # в цикле находим прямую с ближайшей к введённой в программу
     # точкой забора
@@ -383,6 +391,8 @@ def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
     contour, lines = get_work_diagram(turbine_mark)
 
     entrance_collection_point = get_collection_point(turbine_mark, season)
+
+    print(entrance_collection_point)
 
     # находим ломаную, относительно которой будет построение новой
     found_line, dist = find_nearest_line(lines, entrance_collection_point)

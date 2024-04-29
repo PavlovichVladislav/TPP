@@ -223,6 +223,4 @@ def calc_flow_char(flow_chars):
     # апроксимируем до 0
     flow_char = update_flow_char(flow_char)
 
-    plot_flow(flow_char)
-
     return flow_char

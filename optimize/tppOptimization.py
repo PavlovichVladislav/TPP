@@ -1,83 +1,103 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
+from scipy.stats import linregress
 
 
-def linear_model(x, a, b):
-    x = np.array(x)
+def tppOptimize(MR, MC, demand):
+    # Создаем transformed_MR
+    transformed_MR = {'pg': [pg / 720 for pg in MR['pg']], 'mr': MR['mr']}
 
-    return a * x + b
+    # Создаем transformed_demand
+    transformed_demand = {'pg': [pg / 720 for pg in demand['pg']], 'price': demand['price']}
+
+    # Находим линейную модель для transformed_MR
+    slope_mr, intercept_mr, _, _, _ = linregress(transformed_MR['pg'], transformed_MR['mr'])
+
+    def model_mr(x):
+        return slope_mr * x + intercept_mr
+
+    # Находим линейную модель для transformed_demand
+    slope_demand, intercept_demand, _, _, _ = linregress(transformed_demand['pg'], transformed_demand['price'])
+
+    def model_demand(x):
+        return slope_demand * x + intercept_demand
+
+    # Инициализируем массивы new_Mr и new_demand_price
+    new_Mr = []
+    new_demand_price = []
+
+    # Перебираем массив MC['N']
+    for n in MC['N']:
+        # Добавляем значения model_mr(MC['N'][i]) в new_Mr
+        new_Mr.append(model_mr(n))
+        # Добавляем значения model_demand(MC['N'][i]) в new_demand_price
+        new_demand_price.append(model_demand(n))
+
+    # Формируем коллекции new_MR и new_Demand
+    new_MR = {'pg': MC['N'], 'mr': new_Mr}
+    new_Demand = {'pg': MC['N'], 'price': new_demand_price}
+
+    # Находим точку пересечения моделей MR и MC
+    intersection_point = None
+    for i in range(len(MC['N']) - 1):
+        x1, y1 = MC['N'][i], MC['b'][i]
+        x2, y2 = MC['N'][i + 1], MC['b'][i + 1]
+        m_mc = (y2 - y1) / (x2 - x1)
+        b_mc = y1 - m_mc * x1
+        m_mr = slope_mr
+        b_mr = intercept_mr
+        # Проверяем пересечение отрезка с прямой model_mr
+        x = (b_mr - b_mc) / (m_mc - m_mr)
+        y = m_mr * x + b_mr
+        if min(x1, x2) <= x <= max(x1, x2) and min(y1, y2) <= y <= max(y1, y2):
+            intersection_point = (x, y)
+            break
+
+    # Находим y_opt
+    if intersection_point:
+        x_opt = intersection_point[0]
+        y_opt = model_demand(x_opt)
+    else:
+        x_opt = None
+        y_opt = None
+
+    # Вызываем функцию plot_graph
+    plot_graph(new_MR, new_Demand, MC, intersection_point, x_opt, y_opt)
+
+    return x_opt, y_opt, new_MR, new_Demand, MC
 
 
-def quadratic_model(x, a, b, c):
-    x = np.array(x)
-
-    return a * x ** 2 + b * x + c
-
-
-def cubic_model(x, a, b, c, d):
-    x = np.array(x)
-
-    return a * x ** 3 + b * x ** 2 + c * x + d
-
-
-def find_best_fit(x, y):
-    models = [linear_model, quadratic_model, cubic_model]
-    best_model = None
-    best_error = float('inf')
-
-    for model in models:
-        params, _ = curve_fit(model, x, y)
-        y_pred = model(x, *params)
-        error = np.mean((y - y_pred) ** 2)
-
-        if error < best_error:
-            best_error = error
-            best_model = model
-
-    return best_model, params
-
-
-def find_intersection_point(x_data, y_data, model_mr, params_mr):
-    for i in range(len(x_data) - 1):
-        x1, x2 = x_data[i], x_data[i + 1]
-        y1, y2 = y_data[i], y_data[i + 1]
-
-        if y1 < model_mr(x1, *params_mr) and y2 > model_mr(x2, *params_mr):
-            m = (y2 - y1) / (x2 - x1)
-            x_opt = (model_mr(x1, *params_mr) - y1) / m + x1
-            y_opt = model_mr(x_opt, *params_mr)
-            return x_opt, y_opt
-
-def plot_graph(transformed_mr, transformed_demand, MC, intersection_point, x_opt, y_opt):
+def plot_graph(new_MR, new_Demand, MC, intersection_point, x_opt, y_opt):
     plt.figure(figsize=(10, 6))
-    plt.plot(transformed_mr['pg'], transformed_mr['mr'], label='Transformed MR', marker='o')
-    plt.plot(transformed_demand['pg'], transformed_demand['price'], label='Transformed Demand', marker='o')
+
+    # График new_MR
+    plt.plot(new_MR['pg'], new_MR['mr'], label='Transformed MR', marker='o')
+
+    # График new_Demand
+    plt.plot(new_Demand['pg'], new_Demand['price'], label='Transformed Demand', marker='o')
+
+    # График MC
     plt.plot(MC['N'], MC['b'], label='MC', marker='o')
-    plt.plot([intersection_point[0], x_opt], [intersection_point[1], 0], 'ro')
-    plt.plot([intersection_point[0], 0], [intersection_point[1], y_opt], 'ro')
+
+    # Точка intersection_point
+    if intersection_point:
+        plt.plot(intersection_point[0], intersection_point[1], 'ro', label='Intersection Point')
+
+    # Точка (x_opt, 0)
+    if x_opt is not None:
+        plt.plot(x_opt, 0, 'go', label='Optimal Quantity')
+
+    # Точка (0, y_opt)
+    if y_opt is not None:
+        plt.plot(0, y_opt, 'bo', label='Optimal Price')
+
     plt.xlabel('Quantity')
-    plt.ylabel('Price/Cost')
-    plt.title('Optimization')
+    plt.ylabel('Price')
+    plt.title('MR, Demand, and MC Graph')
     plt.legend()
     plt.grid(True)
     plt.show()
 
-
-def tppOptimize(MR, MC, demand):
-    transformed_mr = {'pg': [pg / 720 for pg in MR['pg']], 'mr': MR['mr']}
-    transformed_demand = {'pg': [pg / 720 for pg in demand['pg']], 'price': demand['price']}
-
-    model_mr, params_mr = find_best_fit(transformed_mr['pg'], transformed_mr['mr'])
-    model_demand, _ = find_best_fit(transformed_demand['pg'], transformed_demand['price'])
-
-    x_opt, y_opt = find_intersection_point(MC['N'], MC['b'], model_mr, transformed_mr['pg'])
-
-    intersection_point = (x_opt, model_mr(x_opt))
-
-    plot_graph(transformed_mr, transformed_demand, MC, intersection_point, x_opt, y_opt)
-
-# Пример использования
 MR = {
     'pg': [14000, 17000, 20000, 22000, 24000, 27000, 30000, 30100],
     'mr': [611.812, 456.245, 338.518, 252.676, 155.787, 53.821, 6.768, 3.923]}
@@ -89,4 +109,34 @@ demand = {'pg': [14000, 17000, 20000, 22000, 24000, 27000, 30000, 30100, 30200],
           'price': [1153.823537, 1058.174361, 967.885009, 910.6697875, 855.837, 778.053614, 705.6303418, 703.3085408,
                     700.9926952]}
 
-# tppOptimize(MR, MC, demand)
+# x_opt, y_opt = tppOptimize(MR, MC, demand)
+
+# print(x_opt, y_opt)
+
+# import matplotlib.pyplot as plt
+#
+# MR = {
+#     'pg': [14000, 17000, 20000, 22000, 24000, 27000, 30000, 30100],
+#     'mr': [611.812, 456.245, 338.518, 252.676, 155.787, 53.821, 6.768, 3.923]}
+#
+# MC = {'N': [23, 36, 45, 49.9, 56, 67.5, 89.5, 112, 126.4],
+#       'b': [17.623, 17.721, 17.725, 17.732, 24.585, 24.596, 24.614, 24.687, 24.796]}
+#
+# demand = {'pg': [14000, 17000, 20000, 22000, 24000, 27000, 30000, 30100, 30200],
+#           'price': [1153.823537, 1058.174361, 967.885009, 910.6697875, 855.837, 778.053614, 705.6303418, 703.3085408,
+#                     700.9926952]}
+#
+# # Деление значений на 720
+# MR['pg'] = [pg / 720 for pg in MR['pg']]
+# demand['pg'] = [pg / 720 for pg in demand['pg']]
+#
+# # Построение графиков
+# plt.plot(MR['pg'], MR['mr'], label='MR')
+# plt.plot(MC['N'], MC['b'], label='MC')
+# plt.plot(demand['pg'], demand['price'], label='Demand')
+# plt.xlabel('pg')
+# plt.ylabel('Price or b or MR')
+# plt.title('Графики MR, MC, и Demand')
+# plt.legend()
+# plt.grid(True)
+# plt.show()

@@ -98,7 +98,7 @@ class DataForBoilerHop(BaseModel):
 
 
 @app.post("/boilers/boiler-hop")
-def calc_boiler_hop(
+def calculate_boiler_hop(
         hopData: DataForBoilerHop
 ):
     hop = calc_boiler_hop({'load': hopData.load, 'efficiency': hopData.efficiency})
@@ -180,6 +180,7 @@ def get_turbines_optimal(
         'offSeasonTurbines': offSeason_turbines_combination
     })
 
+
 class DataForCollectionPoint(BaseModel):
     steam_consumption: List[float]
     season: str
@@ -193,12 +194,15 @@ def get_turbines_shop_hop(
 
     return collection_point
 
+
 class TurbineData(BaseModel):
     turbine_mark: str
     steam_consumption: List[float]
 
+
 class TurbineDataForHop(TurbineData):
     season: str
+
 
 @app.post("/turbines/turbine-hop")
 def get_turbine_hop(
@@ -210,6 +214,7 @@ def get_turbine_hop(
 
     return turbines_hop
 
+
 class TurbinesShopHopData(BaseModel):
     turbines_data: List[TurbineData]
     season: str
@@ -217,7 +222,7 @@ class TurbinesShopHopData(BaseModel):
 
 @app.post("/turbines/turbine-shop-hop")
 def get_turbines_shop_hop(
-    data: TurbinesShopHopData
+        data: TurbinesShopHopData
 ):
     turbines = [turbine.dict() for turbine in data.turbines_data]
 
@@ -276,16 +281,18 @@ class Demand(BaseModel):
     pg: List[float]
     price: List[float]
 
+
 class stationOptimizeData(BaseModel):
     hop: Hop
     fuelPirce: List[float]
     demand: Demand
     season: str
 
+
 # Оптимальный режим работы станции за сезон
 @app.post("/station/optimize")
 def get_turbines_shop_hop(
-    data: stationOptimizeData
+        data: stationOptimizeData
 ):
     # Преобразуем входные данные в словари
     hop = data.hop.dict()
@@ -297,6 +304,30 @@ def get_turbines_shop_hop(
     mc = calculate_mc(hop, data.fuelPirce, data.season)
 
     # Считаем оптимальный режим работы станции
-    optimize = tppOptimize(mr, mc, demand)
+    n1_opt, p1_opt, MR_1, Demand_1, MC_1 = tppOptimize(mr, mc, demand)
 
-    return {'optimize': optimize}
+    # Копируем pg из demand
+    demand_25percent = Demand(pg=data.demand.pg, price=[])
+
+    # Увеличиваем значения price на 25%
+    demand_25percent.price = [price * 1.25 for price in data.demand.price]
+
+    # Считаем предельный доход
+    mr_25percent = calculate_mr(demand_25percent.dict())
+
+    # Считаем оптимальный режим работы станции
+    n2_opt, p2_opt, MR_2, Demand_2, MC_2 = tppOptimize(mr_25percent, mc, demand_25percent.dict())
+
+    # Составляем таблицу - результат
+    zero_percent = [round(n1_opt, 2), round(n1_opt * 720, 2), round(p1_opt, 2), round(n1_opt * p1_opt, 2), 0]
+    up_percent = [round(n2_opt, 2), round(n2_opt * 720, 2), round(p2_opt, 2), round(n2_opt * p2_opt, 2),
+                  round(n2_opt * p2_opt - n1_opt * p1_opt, 2)]
+
+    return {'zero_percent': zero_percent,
+            "mr": MR_1,
+            "mc": MC_1,
+            'demand': Demand_1,
+            "25_percent": up_percent,
+            "mr_25": MR_2,
+            "mc_25": MC_2,
+            'demand_25': Demand_2}

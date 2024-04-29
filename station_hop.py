@@ -36,6 +36,10 @@ def find_correspond_Q(N, flow_char):
     return b_boilers_shop
 
 def calc_station_hop(boilers_hop, turbines_hop, flow_char):
+    print(boilers_hop)
+    print(turbines_hop)
+    print('flow', flow_char)
+
     b = []
     N = []
 
