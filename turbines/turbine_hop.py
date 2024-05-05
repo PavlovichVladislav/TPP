@@ -12,7 +12,7 @@ offSeason_month_numbers = [9, 10, 4, 5]
 # Надо заносить в БД
 t_20_90_steam_selection = [28.3, 35.7, 27, 25.2, 15.1, 10.6, 23.7, 17.2, 27.8, 29, 35.6, 36.6]
 pt_65_75_130_13_steam_selection = [70.2, 47.6, 63.1, 53.1, 0, 0, 0, 0, 0, 20.2, 51.3, 51]
-pt_80_100_130_13_steam_selection = [120, 125, 130, 135, 140, 145, 0, 5, 10, 15, 20, 25]
+pt_80_100_130_13_steam_selection = [95.4, 80.9, 82.5, 76.5, 43.6, 22.4, 33, 31.5, 33.1, 68.6, 65.5, 55.3]
 
 
 def get_collection_point(turbine_mark, season):
@@ -48,10 +48,6 @@ def get_collection_point(turbine_mark, season):
     collection_point /= len(month_numbers)
 
     return collection_point
-
-# центр графика, пока что хардкоженый
-middle_point = 70
-
 
 # Ф-я, которая вычисляет Евклидово расстояние между двумя точками
 def calc_distance(point1, point2):
@@ -139,9 +135,6 @@ def find_nearest_line(lines, entrance_collection_point):
     min_collection_point_diff = float('inf')
     found_line = None
 
-    print(lines)
-    print(entrance_collection_point)
-
     # в цикле находим прямую с ближайшей к введённой в программу
     # точкой забора
     # по этой ломаной мы бдуем строить новую
@@ -154,32 +147,19 @@ def find_nearest_line(lines, entrance_collection_point):
             min_collection_point_diff = collection_point_diff
             found_line = line
 
-    # у ломаной, относительно которой мы будем строить нашу новую ломаную ОПРТ
-    # нужно найти точку излома, которая будет ближе всего лежать к центру
-    nearest_point_to_midle = find_nearest_point(found_line, middle_point)
     # находим вторую прямую, наша новая ломаная будет лежать между found_line и second_line
     # вторая прямая нужна, чтоб можно было вычислить расстояние, на котором будет лежать наша новая ломаная
     second_line = find_second_closest_line(entrance_collection_point, found_line, lines)
 
-    # найдём расстояние от nearest_point_to_midle до второй ломаной
-    # складываем все её точки в один массив
-    points = [second_line['start']] + second_line['points'] + [second_line['end']]
-    min_dist = float('inf')
-
-    # перебираем последовательно все прямые ломаной и вычисляем расстояние
-    for i in range(len(points) - 1):
-        dist = distance_to_line(nearest_point_to_midle, [points[i], points[i + 1]])
-
-        if dist < min_dist:
-            min_dist = dist
+    dist = calc_distance(found_line['start'], second_line['start'])
 
     # мы нашли полное расстояние между ломаными, между которыми будет лежать наша новая ломаная
     # теперь нужно взять это расстояния пропорционально collection_point этих двух прямых
 
-    result_dist = min_dist * (min_collection_point_diff
+    result_dist = dist * (min_collection_point_diff
                               / (abs(found_line['collection_point'] - second_line['collection_point'])))
 
-    return found_line, min_collection_point_diff
+    return found_line, result_dist
 
 
 # Ф-я для поиска пересечений ломаной и контура
@@ -313,11 +293,11 @@ def plot_lines(lines, contour, entrance_collection_point, turbine_mark):
         # Если точка из lines, то у неё есть collection_point
         # Иначе это точка нашей новой прямой, которая приходит на вход программы
         if ("collection_point" in line):
-            label = line["collection_point"]
+            label = str(line["collection_point"]) + ' Гкал/ч'
             color = 'orange'
         else:
             color = 'magenta'
-            label = entrance_collection_point
+            label = str(round(entrance_collection_point, 2))  + ' Гкал/ч'
 
         plt.plot(*zip(line['start'], *line['points'], line['end']), marker='o',
                  label=label, color=color)
@@ -378,10 +358,10 @@ def plot_hop(data, turbine_mark):
         x_values.extend(interval)
         y_values.extend([tangent, tangent])
 
+    plt.figure(num='ХОП турбины' + turbine_mark)
     plt.plot(x_values, y_values, marker='o')
     plt.xlabel('N, мвт')
-    plt.ylabel('Гкал / мвт/ч')
-    plt.title('ХОП турбины' + turbine_mark)
+    plt.ylabel('Гкал / МВт*ч')
     plt.show()
 
 # Расчёт хоп отдельной турбины
@@ -391,8 +371,6 @@ def calc_turbine_hop(turbine_mark, season, plot_for_turbines):
     contour, lines = get_work_diagram(turbine_mark)
 
     entrance_collection_point = get_collection_point(turbine_mark, season)
-
-    print(entrance_collection_point)
 
     # находим ломаную, относительно которой будет построение новой
     found_line, dist = find_nearest_line(lines, entrance_collection_point)

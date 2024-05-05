@@ -43,9 +43,9 @@ def calc_boilers_shop_hop_per_season(boilers_hop, plot_for_shop, plot_for_boiler
     # Т.е. для равных B у котлов находим их значения D и суммируем
     for i, b in enumerate(unique_hops):
         for params in (hop_models):
-            teta1, teta2, teta3, teta4 = params
+            teta1, teta2 = params
             # Вычисляем значение D зная параметры teta и нужную точку
-            q_value = model(b, teta1, teta2, teta3, teta4)
+            q_value = model(b, teta1, teta2)
 
             Q[i] += q_value
 
@@ -53,6 +53,6 @@ def calc_boilers_shop_hop_per_season(boilers_hop, plot_for_shop, plot_for_boiler
     Q = [round(q, 3) for q in Q]
 
     if (plot_for_shop):
-        plot_graph(Q, unique_hops, 'Хоп котельного цеха', 'Dк, т/x', 'b, т.у.т/Гкал')
+        plot_graph(Q, unique_hops, 'Хоп котельного цеха', 'Q, Гкал', 'b, т.у.т/Гкал')
 
     return {'b': unique_hops, 'Q': Q}

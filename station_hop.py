@@ -20,7 +20,9 @@ def find_correspond_Q(N, flow_char):
 
     # Проверяем, что удалось найти две точки
     if point1_index is None or point2_index is None:
-        raise ValueError("Cannot find two points for the given N")
+        # raise ValueError("Cannot find two points for the given N", N)
+        point1_index = len(points) - 2
+        point2_index = len(points) - 1
 
     # Извлекаем координаты точек
     x1, y1 = points[point1_index]

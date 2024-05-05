@@ -23,29 +23,29 @@ def plot_hop(data):
 
     plt.plot(x_values, y_values, marker='o')
     plt.xlabel('N, мвт')
-    plt.ylabel('Гкал / мвт/ч')
-    plt.title('ХОП турбинного цеха')
+    plt.ylabel('Гкал / МВт*ч')
+    # plt.title('ХОП турбинного цеха')
     plt.show()
 
 def process_turbines(turbines_hop):
-    # Combine all dictionaries into one array
+    # Объединяем все словари в один массив
     temp_arr = []
     for turbine in turbines_hop:
         temp_arr.extend(turbine)
 
-    # Sort temp_arr by 'tangent' in descending order
+    # Сортируем temp_arr по «тангенсу» в порядке убывания
     temp_arr.sort(key=lambda x: x['tangent'], reverse=False)
 
-    result_arr = [temp_arr[0]]  # Initialize result_arr with the first element of temp_arr
+    result_arr = [temp_arr[0]]  # Инициализируем result_arr первым элементом temp_arr
 
-    # Iterate over temp_arr starting from the second element
+    # Перебираем temp_arr, начиная со второго элемента
     for i in range(1, len(temp_arr)):
         if temp_arr[i] == temp_arr[i - 1]:
-            # If the current dictionary is equal to the previous one,
-            # extend the interval of the previous dictionary
+            # Если текущий словарь равен предыдущему,
+            # расширяем интервал предыдущего словаря
             result_arr[-1]['interval'][1] += temp_arr[i]['interval'][1] - temp_arr[i]['interval'][0]
         else:
-            # Otherwise, create a new dictionary and append it to result_arr
+            # В противном случае создайте новый словарь и добавьте его в result_arr
             new_interval = [
                 result_arr[-1]['interval'][1],
                 result_arr[-1]['interval'][1] + (temp_arr[i]['interval'][1] - temp_arr[i]['interval'][0])
@@ -63,6 +63,9 @@ def calc_turbines_shop_hop(turbines, season, plot_for_turbines):
         turbine_hop = calc_turbine_hop(turbine['type'], season, plot_for_turbines)
         turbines_hops.append(turbine_hop['hop'])
         flow_chars.append({'mark': turbine_hop['mark'], 'flow_char': turbine_hop['flow_char']})
+
+        print('ХОП для турбины', turbine['type'], ' ', season)
+        print(turbine_hop['hop'])
 
     # Посчитаем хоп турбинного цеха из ХОП отдельных турбин
     turbine_shop_hop = process_turbines(turbines_hops)

@@ -61,12 +61,12 @@ year_task = [
     {'month': 12, 'powerGeneration': 238, 'output_power': 319.9, 'heatRelease': 291.2, 'heat_performance': 661.46}
 ]
 #
-# (summer_boilers_combination,
-#  winter_boilers_combination,
-#  offSeason_boilers_combination,
-#  summer_turbines_combination,
-#  winter_turbines_combination,
-#  offSeason_turbines_combination) = calc_optimal_quipment(year_task, boilers, turbines)
+# # (summer_boilers_combination,
+# #  winter_boilers_combination,
+# #  offSeason_boilers_combination,
+# #  summer_turbines_combination,
+# #  winter_turbines_combination,
+# #  offSeason_turbines_combination) = calc_optimal_quipment(year_task, boilers, turbines)
 #
 # (summer_boilers_combination,
 #  winter_boilers_combination,

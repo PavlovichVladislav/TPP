@@ -104,25 +104,15 @@ def find_nearest_line(lines, entrance_collection_point):
     # вторая прямая нужна, чтоб можно было вычислить расстояние, на котором будет лежать наша новая ломаная
     second_line = find_second_closest_line(entrance_collection_point, found_line, lines)
 
-    # найдём расстояние от nearest_point_to_midle до второй ломаной
-    # складываем все её точки в один массив
-    points = [second_line['start']] + second_line['points'] + [second_line['end']]
-    min_dist = float('inf')
-
-    # перебираем последовательно все прямые ломаной и вычисляем расстояние
-    for i in range(len(points) - 1):
-        dist = distance_to_line(nearest_point_to_midle, [points[i], points[i + 1]])
-
-        if dist < min_dist:
-            min_dist = dist
+    dist = calc_distance(found_line['start'], second_line['start'])
 
     # мы нашли полное расстояние между ломаными, между которыми будет лежать наша новая ломаная
     # теперь нужно взять это расстояния пропорционально collection_point этих двух прямых
 
-    result_dist = min_dist * (min_collection_point_diff
+    result_dist = dist * (min_collection_point_diff
                               / (abs(found_line['collection_point'] - second_line['collection_point'])))
 
-    return found_line, min_collection_point_diff
+    return found_line, result_dist
 
 
 # Ф-я для поиска пересечений ломаной и контура

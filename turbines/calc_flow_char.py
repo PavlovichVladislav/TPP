@@ -65,6 +65,15 @@ def delta(point1, point2):
     return delta_x, delta_y
 
 def sum_flow_char(component1, component2):
+
+    if len(component1['points']) == 0 and len(component2['points']) == 0:
+        sum_flow_char = component1
+        dx = component2['end'][0] - component2['start'][0]
+        dy = component2['end'][1] - component2['start'][1]
+        sum_flow_char['end'] = (sum_flow_char['end'][0] + dx, sum_flow_char['end'][1] + dy)
+
+        return sum_flow_char
+
     # Определение flow_char1 и flow_char2
     if len(component1['points']) <= len(component2['points']):
         flow_char1 = component1
@@ -222,5 +231,7 @@ def calc_flow_char(flow_chars):
 
     # апроксимируем до 0
     flow_char = update_flow_char(flow_char)
+
+    plot_flow(flow_char)
 
     return flow_char

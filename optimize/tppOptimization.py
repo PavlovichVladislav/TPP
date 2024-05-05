@@ -110,9 +110,9 @@ demand = {'pg': [14000, 17000, 20000, 22000, 24000, 27000, 30000, 30100, 30200],
                     700.9926952]}
 
 # x_opt, y_opt = tppOptimize(MR, MC, demand)
-
+#
 # print(x_opt, y_opt)
-
+#
 # import matplotlib.pyplot as plt
 #
 # MR = {
