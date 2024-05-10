@@ -1,5 +1,5 @@
 # from boilers.calc_boilers_hop import calc_boilers_hop_per_season
-# from boilers.calc_boilers_shop_hop import calc_boilers_shop_hop_per_season
+# from boilers.calc_boilers_shop_rgc import calc_boilers_shop_rgc_per_season
 # from getTestEquipment import getTestEquipment
 # from optimize.calculateMC import calculate_mc
 # from optimize.calculateMR import calculate_mr

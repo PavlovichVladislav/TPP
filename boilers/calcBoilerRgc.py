@@ -65,7 +65,7 @@ def calc_hop(relative_increase_losses):
     return hop
 
 # inputData - исходные данные по марке котла
-def calc_boiler_hop(inputData):
+def calc_boiler_rgc(inputData):
     # расчёт потерь тепла Qпот
     heat_loss = calc_heat_loss(inputData)
     # Средние значения нагрузок Qср

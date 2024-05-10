@@ -17,7 +17,7 @@ def plot_graph(x, y, title="График", x_label="Ось X", y_label="Ось Y
     plt.grid(True)
     plt.show()
 
-def calc_boilers_shop_hop_per_season(boilers_hop, plot_for_shop, plot_for_boiler):
+def calc_boilers_shop_rgc_per_season(boilers_hop, plot_for_shop, plot_for_boiler):
     # Для началаа нужно найти все уникальные значения b - промежуток суммирования
     # Т.к. значение hop у котлов в одних пределах, но могут быть
     # Немного разными
