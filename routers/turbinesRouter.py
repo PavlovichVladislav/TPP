@@ -15,7 +15,7 @@ turbineRouter = APIRouter(
 )
 
 
-class TurbineData(BaseModel):
+class Turbine(BaseModel):
     """
     Информация об одном котле
 
@@ -34,7 +34,7 @@ class TurbineData(BaseModel):
 
 @turbineRouter.post("/get-optimal")
 def get_turbines_optimal(
-        turbines: List[TurbineData]
+        turbines: List[Turbine]
 ):
     """
     Получение оптимального состава турбин на каждый сезон года.
@@ -77,7 +77,7 @@ class TurbineDataForHop(TurbineSteamConsumption):
     season: str
 
 
-@turbineRouter.post("/turbine-hop")
+@turbineRouter.post("/turbine-rgc")
 def get_turbine_hop(
         turbine_data: TurbineDataForHop
 ):
@@ -99,7 +99,7 @@ class TurbinesShopHopData(BaseModel):
     season: str
 
 
-@turbineRouter.post("/turbine-shop-hop")
+@turbineRouter.post("/turbine-shop-rgc")
 def get_turbines_shop_hop(
         data: TurbinesShopHopData
 ):

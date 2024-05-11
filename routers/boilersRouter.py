@@ -5,7 +5,7 @@ from typing import List
 from boilers.calcBoilerRgc import calc_boiler_rgc
 from boilers.calc_boilers_shop_rgc import calc_boilers_shop_rgc_per_season
 from calc_optimal_equipment import optimal_equipment_combination_per_season
-from consts import summer_month_numbers, winter_month_numbers, offSeason_month_numbers
+from consts import summer_month_numbers, winter_month_numbers, off_season_month_numbers
 from mainOld import year_task
 
 boilersRouter = APIRouter(
@@ -18,15 +18,15 @@ class Boiler(BaseModel):
     """
     Информация об одном котле
 
-    :param stationNumber: Станционный номер котла.
+    :param station_number: Станционный номер котла.
     :param mark: Марка котла.
-    :param heatPerformance: Номинальная максимальная теплопроизводительность Т/Ч.
-    :param numberOfStarts: Количество запусков с момента начала эксплуатации.
+    :param heat_performance: Номинальная максимальная теплопроизводительность Т/Ч.
+    :param number_of_starts: Количество запусков с момента начала эксплуатации.
     """
     station_number: str
     mark: str
     heat_performance: int
-    station_number: int
+    number_of_starts: int
 
 
 class BoilersInventory(BaseModel):
@@ -38,10 +38,23 @@ class BoilersInventory(BaseModel):
     boilers: List[Boiler]
 
 
+class BoilersOptimalCombination(BaseModel):
+    """
+    Оптимальная комбинация котлов для каждого сезона
+
+    :param summer_boilers: Оптимальная комбинация котлов для летнего сезона.
+    :param winter_boilers: Оптимальная комбинация котлов для зимнего сезона.
+    :param off_season_boilers: Оптимальная комбинация котлов для межсезонья.
+    """
+    summer_boilers: List[Boiler]
+    winter_boilers: List[Boiler]
+    off_season_boilers: List[Boiler]
+
+
 @boilersRouter.post("/optimal")
 def get_boilers_optimal(
         data: BoilersInventory
-):
+) -> BoilersOptimalCombination:
     """
     Получение оптимального состава котлов на каждый сезон года.
 
@@ -50,43 +63,52 @@ def get_boilers_optimal(
     """
     boilers = [boiler.dict() for boiler in data.boilers]
 
-    print('optimal')
-
     summer_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers, summer_month_numbers,
                                                                           'boilers')
     winter_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers, winter_month_numbers,
                                                                           'boilers')
-    offSeason_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers,
-                                                                             offSeason_month_numbers, 'boilers')
-    return ({
-        'summerBoilers': summer_boilers_combination,
-        'winterBoilers': winter_boilers_combination,
-        'offSeasonBoilers': offSeason_boilers_combination
-    })
+    off_season_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers,
+                                                                              off_season_month_numbers, 'boilers')
+    return BoilersOptimalCombination(
+        summer_boilers=summer_boilers_combination,
+        winter_boilers=winter_boilers_combination,
+        off_season_boilers=off_season_boilers_combination
+    )
 
 
-class DataForBoilerRgc(BaseModel):
+class BoilerFactoryData(BaseModel):
     """
-    Данные для расчёта ХОП отдельного котла
+    Заводские данные для расчёта ХОП отдельного котла
 
-    :param load: Загрузка.
-    :param efficiency: Кпд
+    :param Q: нагрузка
+    :param efficiency: КПД
     """
-    load: List[float]
+    Q: List[float]
     efficiency: List[float]
+
+
+class BoilerRgc(BaseModel):
+    """
+    ХОП Котла
+
+    :param b: значение ХОП
+    :param Q: значения нагрузки
+    """
+    b: List[float]
+    Q: List[float]
 
 
 @boilersRouter.post("/boiler-rgc")
 def calculate_boiler_hop(
-        rgcData: DataForBoilerRgc
-):
+        rgc_data: BoilerFactoryData
+) -> BoilerRgc:
     """
     Расчёт ХОП для отдельного котла
 
-    :param rgcData: Исходные данные для расчёта ХОП котла
+    :param rgc_data: Исходные данные для расчёта ХОП котла
     :return: ХОП котла с полями b_values, Q_values
     """
-    rgc = calc_boiler_rgc({'load': rgcData.load, 'efficiency': rgcData.efficiency})
+    rgc = calc_boiler_rgc({'load': rgc_data.load, 'efficiency': rgc_data.efficiency})
 
     return rgc
 

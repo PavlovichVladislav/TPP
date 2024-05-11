@@ -13,7 +13,7 @@ stationRouter = APIRouter(
 )
 
 
-class RgcValuePerInterval(BaseModel):
+class TurbineRgc(BaseModel):
     """
     Составная часть ХОП турбинного цеха
 
@@ -30,7 +30,7 @@ class TurbinesShopHop(BaseModel):
 
     :data : массив интервалов и соответствующих им значений тангенса
     """
-    data: List[RgcValuePerInterval]
+    data: List[TurbineRgc]
 
 
 class BoilerShopHop(BaseModel):
@@ -59,7 +59,7 @@ class ShopFlowChar(BaseModel):
 
 @stationRouter.post("/station-rgc")
 def get_station_rgc(
-        turbineShopHop: List[RgcValuePerInterval],
+        turbineShopHop: List[TurbineRgc],
         boilersShopHop: BoilerShopHop,
         shopFlowChar: ShopFlowChar
 ):
@@ -88,7 +88,7 @@ class MR(BaseModel):
     mr: List[float]
 
 
-class Rgc(BaseModel):
+class StationRgc(BaseModel):
     """
     ХОП станции
 
@@ -119,7 +119,7 @@ class StationOptimizeData(BaseModel):
     :param demand: Характеристика спроса
     :param season: сезон года, для которого считается оптимальный режим
     """
-    rgc: Rgc
+    rgc: StationRgc
     fuel_price: List[float]
     demand: Demand
     season: str
@@ -138,7 +138,7 @@ def get_station_optimal_mode(
             содержат информацию о прибыли, выручке за год
     """
     # Преобразуем входные данные в словари
-    hop = data.hop.dict()
+    hop = data.rgc.dict()
     demand = data.demand.dict()
 
     # Считаем предельный доход
