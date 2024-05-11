@@ -91,12 +91,6 @@ def calculate_boiler_hop(
     return rgc
 
 
-@boilersRouter.get("/boiler")
-def calculate_boiler_hop(
-):
-    return 'hello'
-
-
 class BoilerRGC(BaseModel):
     """
     ХОП котла
