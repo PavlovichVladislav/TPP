@@ -205,6 +205,17 @@ def update_flow_char(flow_char):
 
     return flow_char
 
+# округление результата
+def round_points(flow_char):
+    # Округляем координаты start и end
+    flow_char['start'] = (round(flow_char['start'][0], 3), round(flow_char['start'][1], 3))
+    flow_char['end'] = (round(flow_char['end'][0], 3), round(flow_char['end'][1], 3))
+
+    # Округляем координаты каждой точки в массиве points
+    flow_char['points'] = [(round(point[0], 3), round(point[1], 3)) for point in flow_char['points']]
+
+    return flow_char
+
 # Расчёт расходной характеристики для станции
 # Это переходное звено для расчёта ХОП станции
 def calc_flow_char(flow_chars):
@@ -233,5 +244,7 @@ def calc_flow_char(flow_chars):
     flow_char = update_flow_char(flow_char)
 
     plot_flow(flow_char)
+
+    flow_char = round_points(flow_char)
 
     return flow_char

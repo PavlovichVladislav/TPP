@@ -57,12 +57,23 @@ class ShopFlowChar(BaseModel):
     end: Tuple[float, float]
 
 
+class StationRgc(BaseModel):
+    """
+    ХОП станции
+
+    :param N: диапазон мощностей
+    :param b: значения ХОП
+    """
+    N: List[float]
+    b: List[float]
+
+
 @stationRouter.post("/station-rgc")
 def get_station_rgc(
         turbineShopHop: List[TurbineRgc],
         boilersShopHop: BoilerShopHop,
         shopFlowChar: ShopFlowChar
-):
+) -> StationRgc:
     """
     Расчёт ХОП станции
 
@@ -86,17 +97,6 @@ class MR(BaseModel):
     """
     pg: List[float]
     mr: List[float]
-
-
-class StationRgc(BaseModel):
-    """
-    ХОП станции
-
-    :param N: диапазон мощностей
-    :param b: значения ХОП
-    """
-    N: List[float]
-    b: List[float]
 
 
 class Demand(BaseModel):

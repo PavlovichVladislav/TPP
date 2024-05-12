@@ -99,7 +99,7 @@ def find_nearest_line(lines, entrance_collection_point):
 
     # у ломаной, относительно которой мы будем строить нашу новую ломаную ОПРТ
     # нужно найти точку излома, которая будет ближе всего лежать к центру
-    nearest_point_to_midle = find_nearest_point(found_line, middle_point)
+    # nearest_point_to_midle = find_nearest_point(found_line, middle_point)
     # находим вторую прямую, наша новая ломаная будет лежать между found_line и second_line
     # вторая прямая нужна, чтоб можно было вычислить расстояние, на котором будет лежать наша новая ломаная
     second_line = find_second_closest_line(entrance_collection_point, found_line, lines)
@@ -260,8 +260,9 @@ def calculate_tangents(line):
         # Находим тангенс угла и добавляем его в массив
         tangent = round(len1 / len2, 3)
 
-        tangents.append({'interval': [x, x_next], 'tangent': tangent})
+        tangents.append({'interval': [round(x, 3), round(x_next, 3)], 'tangent': round(tangent, 3)})
 
+        print(tangents)
     return tangents
 
 # Расчёт хоп отдельной турбины
@@ -270,6 +271,7 @@ def calculate_tangents(line):
 def calc_turbine_hop(turbine_mark, entrance_collection_point):
     # По марке турбины определяем диаграмму режимов работ.
     # А именно ограничивающий контур и линии внутри контура
+
     contour, lines = get_work_diagram(turbine_mark)
 
     # находим ломаную в диаграмме режимов работ, относительно которой

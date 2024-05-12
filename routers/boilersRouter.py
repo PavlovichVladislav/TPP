@@ -21,19 +21,19 @@ class Boiler(BaseModel):
     :param station_number: Станционный номер котла.
     :param mark: Марка котла.
     :param heat_performance: Номинальная максимальная теплопроизводительность Т/Ч.
-    :param number_of_starts: Количество запусков с момента начала эксплуатации.
+    :param starts_number: Количество запусков с момента начала эксплуатации.
     """
-    station_number: str
+    station_number: int
     mark: str
     heat_performance: int
-    number_of_starts: int
+    starts_number: int
 
 
 class BoilersInventory(BaseModel):
     """
     Котлы имеющиеся в наличии
 
-    :param data: Список котлов в наличии у станции.
+    :param boilers: Список котлов в наличии у станции.
     """
     boilers: List[Boiler]
 
@@ -46,9 +46,9 @@ class BoilersOptimalCombination(BaseModel):
     :param winter_boilers: Оптимальная комбинация котлов для зимнего сезона.
     :param off_season_boilers: Оптимальная комбинация котлов для межсезонья.
     """
-    summer_boilers: List[Boiler]
-    winter_boilers: List[Boiler]
-    off_season_boilers: List[Boiler]
+    summerBoilers: List[Boiler]
+    winterBoilers: List[Boiler]
+    offSeasonBoilers: List[Boiler]
 
 
 @boilersRouter.post("/optimal")
@@ -70,9 +70,9 @@ def get_boilers_optimal(
     off_season_boilers_combination = optimal_equipment_combination_per_season(year_task, boilers,
                                                                               off_season_month_numbers, 'boilers')
     return BoilersOptimalCombination(
-        summer_boilers=summer_boilers_combination,
-        winter_boilers=winter_boilers_combination,
-        off_season_boilers=off_season_boilers_combination
+        summerBoilers=summer_boilers_combination,
+        winterBoilers=winter_boilers_combination,
+        offSeasonBoilers=off_season_boilers_combination
     )
 
 
@@ -113,7 +113,7 @@ def calculate_boiler_hop(
     return rgc
 
 
-class BoilerRGC(BaseModel):
+class BoilerWithRGC(BaseModel):
     """
     ХОП котла
 
@@ -130,8 +130,8 @@ class BoilerRGC(BaseModel):
 
 @boilersRouter.post("/boiler-shop-rgc")
 def calc_boilers_shop_hop(
-        boilersRgc: List[BoilerRGC]
-):
+        boilersRgc: List[BoilerWithRGC]
+) -> BoilerRgc:
     """
     Расчёт ХОП для котельного цеха
 

@@ -18,12 +18,12 @@ def process_turbines(turbines_hop):
         if temp_arr[i] == temp_arr[i - 1]:
             # If the current dictionary is equal to the previous one,
             # extend the interval of the previous dictionary
-            result_arr[-1]['interval'][1] += temp_arr[i]['interval'][1] - temp_arr[i]['interval'][0]
+            result_arr[-1]['interval'][1] += round(temp_arr[i]['interval'][1] - temp_arr[i]['interval'][0], 3)
         else:
             # Otherwise, create a new dictionary and append it to result_arr
             new_interval = [
-                result_arr[-1]['interval'][1],
-                result_arr[-1]['interval'][1] + (temp_arr[i]['interval'][1] - temp_arr[i]['interval'][0])
+                round(result_arr[-1]['interval'][1], 3),
+                round(result_arr[-1]['interval'][1] + (temp_arr[i]['interval'][1] - temp_arr[i]['interval'][0]), 3)
             ]
             result_arr.append({'interval': new_interval, 'tangent': temp_arr[i]['tangent']})
 
@@ -46,6 +46,9 @@ def calc_turbines_shop_hop(turbines, season):
 
     # Посчитаем хоп турбинного цеха из ХОП отдельных турбин
     turbine_shop_hop = process_turbines(turbines_hops)
+
+    print(turbine_shop_hop)
+
     # Посчитаем расходную характеристику турбинного цеха
 
     flow_char = calc_flow_char(flow_chars)

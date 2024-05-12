@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import List
 
 from calc_optimal_equipment import optimal_equipment_combination_per_season
-from consts import summer_month_numbers, winter_month_numbers, offSeason_month_numbers
+from consts import summer_month_numbers, winter_month_numbers, off_season_month_numbers
 from mainOld import year_task
 from turbines.get_collection_point_new import get_collection_point
 from turbines.turbine_hop_new import calc_turbine_hop
@@ -32,10 +32,16 @@ class Turbine(BaseModel):
     power_generation: float
 
 
+class TurbinesOptimalCombination(BaseModel):
+    summerTurbines: List[Turbine]
+    winterTurbines: List[Turbine]
+    offSeasonTurbines: List[Turbine]
+
+
 @turbineRouter.post("/get-optimal")
 def get_turbines_optimal(
         turbines: List[Turbine]
-):
+) -> TurbinesOptimalCombination:
     """
     Получение оптимального состава турбин на каждый сезон года.
 
@@ -49,12 +55,12 @@ def get_turbines_optimal(
     winter_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines, winter_month_numbers,
                                                                            'turbines')
     offSeason_turbines_combination = optimal_equipment_combination_per_season(year_task, turbines,
-                                                                              offSeason_month_numbers, 'turbines')
-    return ({
-        'summerTurbines': summer_turbines_combination,
-        'winterTurbines': winter_turbines_combination,
-        'offSeasonTurbines': offSeason_turbines_combination
-    })
+                                                                              off_season_month_numbers, 'turbines')
+    return TurbinesOptimalCombination(
+        summerTurbines=summer_turbines_combination,
+        winterTurbines=winter_turbines_combination,
+        offSeasonTurbines=offSeason_turbines_combination
+    )
 
 
 class TurbineSteamConsumption(BaseModel):
@@ -94,14 +100,14 @@ def get_turbine_hop(
     return turbines_hop
 
 
-class TurbinesShopHopData(BaseModel):
+class TurbinesShopRgcData(BaseModel):
     turbines_data: List[TurbineSteamConsumption]
     season: str
 
 
 @turbineRouter.post("/turbine-shop-rgc")
 def get_turbines_shop_hop(
-        data: TurbinesShopHopData
+        data: TurbinesShopRgcData
 ):
     """
     Расчёт ХОП турбинного цеха.
