@@ -62,7 +62,7 @@ def calc_station_hop(boilers_hop, turbines_hop, flow_char):
         b_boiler_value = model(Q)
 
         # Добавили произведене в результат
-        b.append(b_boiler_value * tangent)
+        b.append(round(b_boiler_value * tangent, 2))
 
         # Обработка второй точки интервала
         N.append(interval[1])
@@ -71,6 +71,6 @@ def calc_station_hop(boilers_hop, turbines_hop, flow_char):
         # b_boiler_value = model(Q, teta1, teta2, teta3, teta4)
         b_boiler_value = model(Q)
         # Добавили произведене в результат
-        b.append(b_boiler_value * tangent)
+        b.append(round(b_boiler_value * tangent, 2))
 
     return {'b': b, 'N': N}
