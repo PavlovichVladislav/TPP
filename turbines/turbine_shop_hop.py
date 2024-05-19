@@ -64,14 +64,12 @@ def calc_turbines_shop_hop(turbines, season, plot_for_turbines):
         turbines_hops.append(turbine_hop['hop'])
         flow_chars.append({'mark': turbine_hop['mark'], 'flow_char': turbine_hop['flow_char']})
 
-        print('ХОП для турбины', turbine['type'], ' ', season)
-        print(turbine_hop['hop'])
-
     # Посчитаем хоп турбинного цеха из ХОП отдельных турбин
     turbine_shop_hop = process_turbines(turbines_hops)
     plot_hop(turbine_shop_hop)
 
     return flow_chars, turbine_shop_hop
+
 
 # summer_turbines_combination = [
 #     {'name': 'ТГ03', 'type': 'Т-20-90', 'electricityPower': 20, 'thermalPower': 54, 'powerGeneration': 147.8},

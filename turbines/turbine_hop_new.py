@@ -262,7 +262,6 @@ def calculate_tangents(line):
 
         tangents.append({'interval': [round(x, 3), round(x_next, 3)], 'tangent': round(tangent, 3)})
 
-        print(tangents)
     return tangents
 
 # Расчёт хоп отдельной турбины

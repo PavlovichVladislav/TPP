@@ -4,13 +4,13 @@ from scipy.stats import linregress
 
 
 def tppOptimize(MR, MC, demand):
-    # Создаем transformed_MR
+    # Переводим Э в N, путём деления на 720(часов  в расчётном периоде)
     transformed_MR = {'pg': [pg / 720 for pg in MR['pg']], 'mr': MR['mr']}
 
-    # Создаем transformed_demand
+    # Переводим Э в N, путём деления на 720(часов  в расчётном периоде)
     transformed_demand = {'pg': [pg / 720 for pg in demand['pg']], 'price': demand['price']}
 
-    # Находим линейную модель для transformed_MR
+    # Приближаем MR с помощью линейной модели
     slope_mr, intercept_mr, _, _, _ = linregress(transformed_MR['pg'], transformed_MR['mr'])
 
     def model_mr(x):
@@ -22,36 +22,60 @@ def tppOptimize(MR, MC, demand):
     def model_demand(x):
         return slope_demand * x + intercept_demand
 
-    # Инициализируем массивы new_Mr и new_demand_price
-    new_Mr = []
-    new_demand_price = []
-
-    # Перебираем массив MC['N']
-    for n in MC['N']:
-        # Добавляем значения model_mr(MC['N'][i]) в new_Mr
-        new_Mr.append(model_mr(n))
-        # Добавляем значения model_demand(MC['N'][i]) в new_demand_price
-        new_demand_price.append(model_demand(n))
-
     # Формируем коллекции new_MR и new_Demand
-    new_MR = {'pg': MC['N'], 'mr': new_Mr}
-    new_Demand = {'pg': MC['N'], 'price': new_demand_price}
+    new_MR = {'pg': [], 'mr': []}
+    new_Demand = {'pg': [], 'price': []}
+
+    # Перебираем массив MC['N'] для new_Mr
+    for n in MC['N']:
+        value_mr = model_mr(n)
+        if value_mr > 0:
+            new_MR['mr'].append(value_mr)
+            new_MR['pg'].append(n)
+        else:
+            zero_point_n = -intercept_mr / slope_mr
+            new_MR['mr'].append(0)
+            new_MR['pg'].append(zero_point_n)
+            break
+
+    # Перебираем массив MC['N'] для new_demand_price
+    for n in MC['N']:
+        value_demand = model_demand(n)
+        if value_demand > 0:
+            new_Demand['price'].append(value_demand)
+            new_Demand['pg'].append(n)
+        else:
+            zero_point_n = -intercept_demand / slope_demand
+            new_Demand['price'].append(0)
+            new_Demand['pg'].append(zero_point_n)
+            break
+
+    intersection_point = None
 
     # Находим точку пересечения моделей MR и MC
-    intersection_point = None
     for i in range(len(MC['N']) - 1):
         x1, y1 = MC['N'][i], MC['b'][i]
         x2, y2 = MC['N'][i + 1], MC['b'][i + 1]
-        m_mc = (y2 - y1) / (x2 - x1)
-        b_mc = y1 - m_mc * x1
-        m_mr = slope_mr
-        b_mr = intercept_mr
-        # Проверяем пересечение отрезка с прямой model_mr
-        x = (b_mr - b_mc) / (m_mc - m_mr)
-        y = m_mr * x + b_mr
-        if min(x1, x2) <= x <= max(x1, x2) and min(y1, y2) <= y <= max(y1, y2):
-            intersection_point = (x, y)
-            break
+
+        if x1 == x2:  # Вертикальный отрезок
+            x_vert = x1
+            y_vert = slope_mr * x_vert + intercept_mr
+
+            if min(y1, y2) <= y_vert <= max(y1, y2):
+                intersection_point = (x_vert, y_vert)
+                break
+        else:
+            m_mc = (y2 - y1) / (x2 - x1)
+            b_mc = y1 - m_mc * x1
+            m_mr = slope_mr
+            b_mr = intercept_mr
+
+            x = (b_mr - b_mc) / (m_mc - m_mr)
+            y = m_mr * x + b_mr
+
+            if min(x1, x2) <= x <= max(x1, x2) and min(y1, y2) <= y <= max(y1, y2):
+                intersection_point = (x, y)
+                break
 
     # Находим y_opt
     if intersection_point:
@@ -71,29 +95,28 @@ def plot_graph(new_MR, new_Demand, MC, intersection_point, x_opt, y_opt):
     plt.figure(figsize=(10, 6))
 
     # График new_MR
-    plt.plot(new_MR['pg'], new_MR['mr'], label='Transformed MR', marker='o')
+    plt.plot(new_MR['pg'], new_MR['mr'], label='MR', marker='o')
 
     # График new_Demand
-    plt.plot(new_Demand['pg'], new_Demand['price'], label='Transformed Demand', marker='o')
+    plt.plot(new_Demand['pg'], new_Demand['price'], label='Себестоимость', marker='o')
 
     # График MC
     plt.plot(MC['N'], MC['b'], label='MC', marker='o')
 
     # Точка intersection_point
     if intersection_point:
-        plt.plot(intersection_point[0], intersection_point[1], 'ro', label='Intersection Point')
+        plt.plot(intersection_point[0], intersection_point[1], 'ro', label='Пересечение MR и MC')
 
     # Точка (x_opt, 0)
     if x_opt is not None:
-        plt.plot(x_opt, 0, 'go', label='Optimal Quantity')
+        plt.plot(x_opt, 0, 'go', label='Оптимальная мощность')
 
     # Точка (0, y_opt)
     if y_opt is not None:
-        plt.plot(0, y_opt, 'bo', label='Optimal Price')
+        plt.plot(0, y_opt, 'bo', label='Оптимальная стоимость')
 
-    plt.xlabel('Quantity')
-    plt.ylabel('Price')
-    plt.title('MR, Demand, and MC Graph')
+    plt.xlabel('N, МВт')
+    plt.ylabel('С/c, руб/МВТ*ч')
     plt.legend()
     plt.grid(True)
     plt.show()
