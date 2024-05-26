@@ -2,20 +2,9 @@ def get_work_diagram(turbine_mark):
     contour = []
     lines = []
 
-    if (turbine_mark == 'ПТ-80/100-130/13'):
-        # contour = [(110, 470), (78.5, 470), (72, 444), (50, 296), (37.5, 226), (30, 174), (30, 132), (60, 220), (94, 336)]
+    if turbine_mark == 'ПТ-80/100-130/13':
         contour = [(110, 277.3), (78.5, 277.3), (72, 261.96), (50, 174.64), (37.5, 133.34), (30, 102.66), (30, 77.88),
                    (60, 129.8), (94, 198.24)]
-
-        # lines = [
-        #     {'collection_point': 150, 'start': (72, 444), 'points': [], 'end': (78.5, 470)},
-        #     {'collection_point': 120, 'start': (61.5, 372), 'points': [(79.5, 427)], 'end': (89, 470)},
-        #     {'collection_point': 90, 'start': (50.75, 300), 'points': [(85.5, 410)], 'end': (100, 470)},
-        #     {'collection_point': 60, 'start': (37.5, 228), 'points': [(77, 346), (100, 426)],
-        #      'end': (108.5, 470)},
-        #     {'collection_point': 30, 'start': (30, 166), 'points': [(80, 318)], 'end': (102, 403)},
-        #     {'collection_point': 0, 'start': (30, 132), 'points': [(60, 220)], 'end': (94, 336)}
-        # ]
 
         lines = [
             {'collection_point': 150, 'start': (72, 261.96), 'end': (78.5, 277.3), 'points': []},
@@ -27,7 +16,7 @@ def get_work_diagram(turbine_mark):
             {'collection_point': 0, 'start': (30, 77.88), 'end': (94, 198.24), 'points': [(60, 129.8)]}
         ]
 
-    if (turbine_mark == 'Т-20-90'):
+    if turbine_mark == 'Т-20-90':
         contour = [(18.3, 100.3), (24.9, 100.3), (21.5, 78.47), (5, 25.96), (5, 38.35), (7.3, 48.97), (8.93, 55.46)]
 
         lines = [{'collection_point': 100, 'start': (15.66, 87.91), 'end': (19.3, 100.3), 'points': []},
@@ -42,8 +31,7 @@ def get_work_diagram(turbine_mark):
                  {'collection_point': 10, 'start': (5, 28.91), 'end': (22.5, 84.96), 'points': []},
                  {'collection_point': 0, 'start': (5, 25.96), 'end': (21.5, 78.47), 'points': []}]
 
-    if (turbine_mark == 'ПТ-65/75-130/13'):
-        # contour = [(53.4, 392), (73.4, 392), (73.4, 354.3), (57.14, 245.7), (9.14, 65.7), (9.14, 100)]
+    if turbine_mark == 'ПТ-65/75-130/13':
         contour = [(53.4, 231.28), (73.4, 231.28), (73.4, 209.04), (57.14, 144.96), (9.14, 38.76), (9.14, 59.0)]
 
         lines = [
@@ -56,17 +44,5 @@ def get_work_diagram(turbine_mark):
             {'collection_point': 20, 'start': (9.14, 48.88), 'end': (62, 165.2), 'points': []},
             {'collection_point': 0, 'start': (9.14, 38.76), 'end': (57.14, 144.96), 'points': []}
         ]
-
-        # lines = [
-        #     {'collection_point': 140, 'start': (41.42, 314.3), 'end': (62, 392), 'points': []},
-        #     {'collection_point': 120, 'start': (35.42, 274.3), 'end': (66.85, 392), 'points': []},
-        #     {'collection_point': 100, 'start': (29.42, 235.7), 'end': (72, 392), 'points': []},
-        #     {'collection_point': 80, 'start': (23.14, 194.3), 'end': (73.4, 380),
-        #      'points': []},
-        #     {'collection_point': 60, 'start': (16, 138.55), 'end': (73.4, 362.85), 'points': []},
-        #     {'collection_point': 40, 'start': (9.14, 100), 'end': (69.42, 331.4), 'points': []},
-        #     {'collection_point': 20, 'start': (9.14, 82.85), 'end': (62,280), 'points': []},
-        #     {'collection_point': 0, 'start': (9.14, 65.7), 'end': (57.14, 245.7), 'points': []}
-        # ]
 
     return contour, lines

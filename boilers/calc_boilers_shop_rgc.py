@@ -1,25 +1,10 @@
-import matplotlib.pyplot as plt
-
 from utils.calc_boiler_hop_model import calc_boiler_hop_model
 from utils.regression_model import model
 
-# Вспомогательная функиця для построения графика
-# В итоге график будет на фронте
-# to-do: убрать функцию
-def plot_graph(x, y, title="График", x_label="Ось X", y_label="Ось Y"):
-    # Создаем график
-    plt.plot(x, y, marker='o')
 
-    # Добавляем заголовок и метки осей
-    plt.title(title)
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.grid(True)
-    plt.show()
-
-def calc_boilers_shop_rgc_per_season(boilers_hop, plot_for_shop, plot_for_boiler):
+def calc_boilers_shop_rgc_per_season(boilers_hop):
     # Для началаа нужно найти все уникальные значения b - промежуток суммирования
-    # Т.к. значение hop у котлов в одних пределах, но могут быть
+    # Т.к. значение ХОП у котлов в одних пределах, но могут быть
     # Немного разными
     # Например, 0.151 есть для одного котла, а для другого нет
     unique_hops = set()
@@ -33,7 +18,7 @@ def calc_boilers_shop_rgc_per_season(boilers_hop, plot_for_shop, plot_for_boiler
     # Построим регрессию по известным значениям для ХОП каждого котла
     hop_models = []
     for hop in boilers_hop:
-        hop_models.append(calc_boiler_hop_model(hop, plot_for_boiler))
+        hop_models.append(calc_boiler_hop_model(hop))
 
     # Массив Q для результата по котельному цеху
     Q = [0] * len(unique_hops)
@@ -51,8 +36,5 @@ def calc_boilers_shop_rgc_per_season(boilers_hop, plot_for_shop, plot_for_boiler
 
     # Округлим результат до 3 - х знаков после запятой
     Q = [round(q, 3) for q in Q]
-
-    if (plot_for_shop):
-        plot_graph(Q, unique_hops, 'Хоп котельного цеха', 'Q, Гкал', 'b, т.у.т/Гкал')
 
     return {'b': unique_hops, 'Q': Q}

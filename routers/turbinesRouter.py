@@ -5,9 +5,9 @@ from typing import List
 from calc_optimal_equipment import optimal_equipment_combination_per_season
 from consts import summer_month_numbers, winter_month_numbers, off_season_month_numbers
 from mainOld import year_task
-from turbines.get_collection_point_new import get_collection_point
-from turbines.turbine_hop_new import calc_turbine_hop
-from turbines.turbine_shop_hop_new import calc_turbines_shop_hop
+from turbines.get_collection_point import get_collection_point
+from turbines.turbine_hop import calc_turbine_hop
+from turbines.turbine_shop_hop import calc_turbines_shop_hop
 
 turbineRouter = APIRouter(
     prefix="/turbines",

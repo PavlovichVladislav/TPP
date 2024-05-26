@@ -8,15 +8,12 @@ def calculate_mr(demand):
         index1 = i
         index2 = i + 1
 
-        # Найдем изменение цены
-        # P1 - P2
+        # Найдем изменение цены P1 - P2
         deltaP = abs(demand['price'][index1] - demand['price'][index2])
-        # Найдем выработку дополнительной единицы электроэнергии
-        # Э2 - Э1
+        # Найдем выработку дополнительной единицы электроэнергии Э2 - Э1
         deltaPg = abs(demand['pg'][index2] - demand['pg'][index1])
         # Найдем прирост общей выручки
         # Э1*deltaP - P2 * deltaЭ
-        # to-do: заменить модуль
         deltaTR = abs(demand['pg'][index1] * deltaP - demand['price'][index2] * deltaPg)
         # Найдем прирост общей выручки и добавим его в массив MR
         mr = deltaTR / deltaPg

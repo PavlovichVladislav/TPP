@@ -1,12 +1,7 @@
 from utils.bestModel import find_best_fit_model
-from utils.calc_boiler_hop_model import calc_boiler_hop_model
-from utils.regression_model import model
 
 
 def find_correspond_Q(N, flow_char):
-    print(N)
-    print(flow_char)
-
     points = [flow_char['start']] + flow_char['points'] + [flow_char['end']]
 
     # Находим точки между которыми находится N
@@ -20,7 +15,6 @@ def find_correspond_Q(N, flow_char):
 
     # Проверяем, что удалось найти две точки
     if point1_index is None or point2_index is None:
-        # raise ValueError("Cannot find two points for the given N", N)
         point1_index = len(points) - 2
         point2_index = len(points) - 1
 
@@ -32,22 +26,18 @@ def find_correspond_Q(N, flow_char):
     k = (y2 - y1) / (x2 - x1)
     b = y1 - k * x1
 
-    # Вычисляем b_boilers_shop
+    # Вычисляем точку b, которой соответствует значение Q,
+    # которому соответствует значение N
     b_boilers_shop = k * N + b
 
     return b_boilers_shop
 
-def calc_station_hop(boilers_hop, turbines_hop, flow_char):
-    print(boilers_hop)
-    print(turbines_hop)
-    print('flow', flow_char)
 
+def calc_station_hop(boilers_hop, turbines_hop, flow_char):
     b = []
     N = []
 
-    # teta1, teta2, teta3, teta4 = calc_boiler_hop_model(boilers_hop, True, True)
     model = find_best_fit_model(boilers_hop['Q'], boilers_hop['b'], 1)
-
 
     for turbine in turbines_hop:
         interval = turbine['interval']
@@ -58,7 +48,6 @@ def calc_station_hop(boilers_hop, turbines_hop, flow_char):
         # Нашли по N соответствующую точку Q с помощью расходной характеристики
         Q = find_correspond_Q(interval[0], flow_char)
         # Вычисляем соответствующую точку на ХОП котельного цеха
-        # b_boiler_value = model(Q, teta1, teta2, teta3, teta4)
         b_boiler_value = model(Q)
 
         # Добавили произведене в результат
@@ -68,7 +57,6 @@ def calc_station_hop(boilers_hop, turbines_hop, flow_char):
         N.append(interval[1])
         # Нашли по N соответствующую точку Q с помощью расходной характеристики
         Q = find_correspond_Q(interval[1], flow_char)
-        # b_boiler_value = model(Q, teta1, teta2, teta3, teta4)
         b_boiler_value = model(Q)
         # Добавили произведене в результат
         b.append(round(b_boiler_value * tangent, 2))

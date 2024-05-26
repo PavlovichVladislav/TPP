@@ -5,7 +5,7 @@ from typing import List, Tuple
 from optimize.calculateMC import calculate_mc
 from optimize.calculateMR import calculate_mr
 from optimize.tppOptimization import tppOptimize
-from station_hop import calc_station_hop
+from optimize.station_hop import calc_station_hop
 
 stationRouter = APIRouter(
     prefix="/station",

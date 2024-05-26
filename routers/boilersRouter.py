@@ -143,6 +143,6 @@ def calc_boilers_shop_hop(
         for item in boilersRgc
     ]
 
-    shop_rgc = calc_boilers_shop_rgc_per_season(boilers_rgc, False, False)
+    shop_rgc = calc_boilers_shop_rgc_per_season(boilers_rgc)
 
     return shop_rgc

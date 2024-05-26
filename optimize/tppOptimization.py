@@ -10,13 +10,13 @@ def tppOptimize(MR, MC, demand):
     # Переводим Э в N, путём деления на 720(часов  в расчётном периоде)
     transformed_demand = {'pg': [pg / 720 for pg in demand['pg']], 'price': demand['price']}
 
-    # Приближаем MR с помощью линейной модели
+    # Приближаем MR линейной регресионной моделью
     slope_mr, intercept_mr, _, _, _ = linregress(transformed_MR['pg'], transformed_MR['mr'])
 
     def model_mr(x):
         return slope_mr * x + intercept_mr
 
-    # Находим линейную модель для transformed_demand
+    # Приближаем transformed_demand линейной регресионной моделью
     slope_demand, intercept_demand, _, _, _ = linregress(transformed_demand['pg'], transformed_demand['price'])
 
     def model_demand(x):
@@ -26,7 +26,10 @@ def tppOptimize(MR, MC, demand):
     new_MR = {'pg': [], 'mr': []}
     new_Demand = {'pg': [], 'price': []}
 
-    # Перебираем массив MC['N'] для new_Mr
+    # Перебираем массив MC['N']
+    # В new_MR попадут те значения, которые вычисляются моделью
+    # в соответствующей точке n из MC['N'] при этом нас интересуют значения
+    # большие нуля
     for n in MC['N']:
         value_mr = model_mr(n)
         if value_mr > 0:
@@ -38,7 +41,8 @@ def tppOptimize(MR, MC, demand):
             new_MR['pg'].append(zero_point_n)
             break
 
-    # Перебираем массив MC['N'] для new_demand_price
+    # Перебираем массив MC['N']
+    # Ситуация аналогична циклу выше
     for n in MC['N']:
         value_demand = model_demand(n)
         if value_demand > 0:
@@ -52,12 +56,13 @@ def tppOptimize(MR, MC, demand):
 
     intersection_point = None
 
-    # Находим точку пересечения моделей MR и MC
+    # Находим точку пересечения MR и MC
     for i in range(len(MC['N']) - 1):
         x1, y1 = MC['N'][i], MC['b'][i]
         x2, y2 = MC['N'][i + 1], MC['b'][i + 1]
 
-        if x1 == x2:  # Вертикальный отрезок
+        # Обрабатываем случай вертикального отрезка
+        if x1 == x2:
             x_vert = x1
             y_vert = slope_mr * x_vert + intercept_mr
 
