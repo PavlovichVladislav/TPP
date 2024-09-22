@@ -230,9 +230,9 @@ def calc_flow_char(flow_chars):
         # апроксимируем до 0
         flow_char = update_flow_char(transformed_flow_chars[0]['flow_char'])
 
-        plot_flow(transformed_flow_chars[0]['flow_char'])
+        # plot_flow(transformed_flow_chars[0]['flow_char'])
 
-        return flow_char
+        return round_points(flow_char)
 
     # результат
     flow_char = sum_flow_char(transformed_flow_chars[0]['flow_char'], transformed_flow_chars[1]['flow_char'])
@@ -242,8 +242,6 @@ def calc_flow_char(flow_chars):
 
     # апроксимируем до 0
     flow_char = update_flow_char(flow_char)
-
-    plot_flow(flow_char)
 
     flow_char = round_points(flow_char)
 

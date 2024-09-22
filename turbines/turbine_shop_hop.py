@@ -2,25 +2,28 @@ from turbines.calc_flow_char import calc_flow_char
 from turbines.turbine_hop import calc_turbine_hop
 from turbines.get_collection_point import get_collection_point
 
+
 def process_turbines(turbines_hop):
-    # Combine all dictionaries into one array
+    # объединяем ХОП в один массив
     temp_arr = []
     for turbine in turbines_hop:
         temp_arr.extend(turbine)
 
-    # Sort temp_arr by 'tangent' in descending order
+    # сортируем массив по значению тангенса
     temp_arr.sort(key=lambda x: x['tangent'], reverse=False)
 
-    result_arr = [temp_arr[0]]  # Initialize result_arr with the first element of temp_arr
+    # Инициализируем result_arr, первый элемент
+    # - 0-й элемент отсортированного массива
+    result_arr = [temp_arr[0]]
 
-    # Iterate over temp_arr starting from the second element
+    # Перебираем temp_arr со второго элемента
     for i in range(1, len(temp_arr)):
         if temp_arr[i] == temp_arr[i - 1]:
-            # If the current dictionary is equal to the previous one,
-            # extend the interval of the previous dictionary
+            # Если предыдущий ХОП и текущий для оной турбины
+            # то просто расширяем интервал
             result_arr[-1]['interval'][1] += round(temp_arr[i]['interval'][1] - temp_arr[i]['interval'][0], 3)
         else:
-            # Otherwise, create a new dictionary and append it to result_arr
+            # Иначе создаём новый кусочек интервала и добавляем в результат
             new_interval = [
                 round(result_arr[-1]['interval'][1], 3),
                 round(result_arr[-1]['interval'][1] + (temp_arr[i]['interval'][1] - temp_arr[i]['interval'][0]), 3)
@@ -28,6 +31,7 @@ def process_turbines(turbines_hop):
             result_arr.append({'interval': new_interval, 'tangent': temp_arr[i]['tangent']})
 
     return result_arr
+
 
 # Расчёт ХОП турбинного цеха
 def calc_turbines_shop_hop(turbines, season):
@@ -49,9 +53,18 @@ def calc_turbines_shop_hop(turbines, season):
 
     print(turbine_shop_hop)
 
-    # Посчитаем расходную характеристику турбинного цеха
+    def round_data(data):
+        for item in data:
+            item['interval'] = [round(num, 3) for num in item['interval']]
+            item['tangent'] = round(item['tangent'], 3)
+        return data
+
+    turbine_shop_hop = round_data(turbine_shop_hop)
+
+    print(turbine_shop_hop)
+
+    # Посчитаем расхо   дную характеристику турбинного цеха
 
     flow_char = calc_flow_char(flow_chars)
 
     return flow_char, turbine_shop_hop
-
